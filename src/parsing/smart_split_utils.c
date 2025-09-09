@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   smart_split_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 04:51:11 by marvin            #+#    #+#             */
-/*   Updated: 2025/07/26 05:01:49 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/02 11:39:49 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ void	parse_input_string(t_cmd *cmd, char *src, char *dest)
         else if (src[i] == '\"')
             handle_double_quotes(cmd, src, dest, &i, &j);
         else if (src[i] == '$' && ft_strcmp(src, "cd"))
+        {
             handle_env_variable(cmd, src, dest, &i, &j);
+        }
         else
             dest[j++] = src[i++];
     }

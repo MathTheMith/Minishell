@@ -15,7 +15,7 @@
 void	free_cmd(t_cmd_exec *cmd)
 {
 	if (!cmd)
-		return;
+		return ;
 	if (cmd->raw_cmd)
 		free(cmd->raw_cmd);
 	if (cmd->args)
@@ -24,7 +24,6 @@ void	free_cmd(t_cmd_exec *cmd)
 		free(cmd->path);
 	free(cmd);
 }
-
 
 void	free_all_cmds(t_cmd *cmd)
 {
@@ -48,4 +47,26 @@ void	free_all_cmds(t_cmd *cmd)
 			free(cmd);
 		cmd = tmp;
 	}
+}
+
+void	free_cleaned_args(char **cleaned_args)
+{
+	int	i;
+
+	if (!cleaned_args)
+		return ;
+	i = 0;
+	while (cleaned_args[i])
+	{
+		free(cleaned_args[i]);
+		i++;
+	}
+	free(cleaned_args);
+}
+
+void	free_clean_args(char **new_args, int j)
+{
+	while (--j >= 0)
+		free(new_args[j]);
+	free(new_args);
 }

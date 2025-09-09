@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+         #
+#    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/26 15:52:09 by tfournie          #+#    #+#              #
-#    Updated: 2025/08/26 15:47:57 by tfournie         ###   ########.fr        #
+#    Updated: 2025/09/07 10:54:35 by marvin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,11 +36,23 @@ SRC_FILES = main.c \
 			parsing/smart_split_and_parse.c \
 			parsing/check_invalid.c \
 			exec/exec.c \
-            exec/exec_args.c \
-			exec/path_exec_args.c \
+            exec/exec_cmd_utils.c \
+            exec/exec_redirections.c \
+            exec/exec_process.c \
+            exec/exec_main.c \
+            exec/exec_pipeline_utils.c \
+            exec/exec_pipeline_child.c \
+            exec/exec_pipeline.c \
+			exec/path_validation.c \
+			exec/path_search.c \
+			exec/path_main.c \
             exec/free_cmd.c \
 			exec/args_input.c \
-			exec/redirections.c \
+			exec/redirect_expansion.c \
+			exec/redirect_validation.c \
+			exec/redirect_input_output.c \
+			exec/redirect_heredoc.c \
+			exec/redirect_main.c \
             exec/$(BUILTINS_PATH)/ft_cd.c \
             exec/$(BUILTINS_PATH)/ft_echo.c \
             exec/$(BUILTINS_PATH)/ft_env.c \
@@ -53,7 +65,7 @@ SRC = $(addprefix $(SRC_PATH)/,$(SRC_FILES))
 OBJ = $(addprefix $(OBJ_DIR)/,$(SRC_FILES:.c=.o))
 DEPS = $(OBJ:.o=.d)
 
-# On récupère tous les .c de libft pour forcer la recompilation si l’un d’eux change
+# On récupère tous les .c de libft pour forcer la recompilation si l'un d'eux change
 LIBFT_SRCS = $(wildcard $(LIBFT_DIR)/*.c )
 LIBFT_HDR = $(LIBFT_DIR)/libft.h
 
@@ -92,5 +104,3 @@ re: fclean all
 .PHONY: all clean fclean re
 
 -include $(DEPS)
-
-

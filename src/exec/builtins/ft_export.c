@@ -11,10 +11,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+
 
 #define ERR_MALLOC "malloc error\n"
 
@@ -150,10 +147,7 @@ bool export_no_args(t_list *env)
         ft_putstr_fd("export ", 1);
         j = 0;
         while (arr[i][j] && arr[i][j] != '=')
-		{
-            ft_putchar_fd(arr[i][j], 2);
-			j++;
-		}
+            ft_putchar_fd(arr[i][j++], 1);
         if (arr[i][j] == '=')
         {
             ft_putstr_fd("=\"", 1);

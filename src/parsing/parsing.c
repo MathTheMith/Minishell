@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/26 16:22:46 by tfournie          #+#    #+#             */
-/*   Updated: 2025/08/27 23:18:18 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/02 12:15:16 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int parsing(char *input, t_cmd ***command, t_list *env_list)
+int parsing(char *input, t_cmd ***command, t_list *env_list, int lec)
 {
 	t_data *data;
 
@@ -21,6 +21,7 @@ int parsing(char *input, t_cmd ***command, t_list *env_list)
 	data = malloc(sizeof(t_data));
 	ft_memset(data, 0, sizeof(t_data));
 	data->input = input;
+	data->lec_save = lec;
 	init_command(command, data, env_list);
 	if (!*command)
 	{

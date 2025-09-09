@@ -12,22 +12,28 @@
 
 #include "minishell.h"
 
-void cd_input(t_cmd *cmds)
+void	cd_input(t_cmd *cmds)
 {
     char *dir;
     char cwd[1000];
     char oldpwd[1000];
 	char *resolved_dir;
+	int arg_count = 0;
 
 	resolved_dir = NULL;
-    if (!cmds->args || !cmds->args[0] || cmds->args[2])
-	{
-		if (cmds->args[2]) {
-		    ft_putstr_fd("cd: too many arguments\n", 2);
-		    cmds->last_exit_code = 1;
-		    return;
-		}
-	}
+    if (cmds->args)
+    {
+        while (cmds->args[arg_count + 1])
+            arg_count++;
+    }
+    
+    if (arg_count > 1)
+    {
+        ft_putstr_fd("cd: too many arguments\n", 2);
+        cmds->last_exit_code = 1;
+        return;
+    }
+    
     if (!getcwd(oldpwd, sizeof(oldpwd)))
     {
         perror("getcwd");
@@ -35,12 +41,11 @@ void cd_input(t_cmd *cmds)
         return;
     }
 	if (!cmds->args[1]) {
-		
-		dir = get_env_value(cmds->env, "HOME");
+	    dir = get_env_value(cmds->env, "HOME");
 	    if (!dir) {
-			ft_putstr_fd("cd: HOME not set\n", 2);
+	        ft_putstr_fd("cd: HOME not set\n", 2);
 	        cmds->last_exit_code = 1;
-			return;
+	        return;
 	    }
 	}
 	else
@@ -55,7 +60,7 @@ void cd_input(t_cmd *cmds)
 	    if (dir[1] == '\0')
 	        dir = home;
 	    else if (dir[1] == '/')
-	        dir = ft_strjoin(home, dir + 1); // ~/xxx
+	        dir = ft_strjoin(home, dir + 1);
 }
 	if (dir && dir[0] == '$')
     {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42lyon.fr>        +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/08/27 00:56:43 by marvin            #+#    #+#             */
-/*   Updated: 2025/08/29 12:30:26 by mvachon          ###   ########lyon.fr   */
+/*   Created: 2025/09/07 15:17:53 by marvin            #+#    #+#             */
+/*   Updated: 2025/09/07 15:19:55 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ char *build_prompt(t_cmd *cmds)
     if (strlen(start) > max_path_len) {
 	
         start = &start[strlen(start) - max_path_len];
-		// printf("...\n");
 	}
     size_t total_len = strlen(blue) + strlen(char_last_exit_code) +
                        strlen("➜  ") + strlen(start) +
@@ -83,23 +82,58 @@ void	sigint_handler(int signo)
 {
 	(void)signo;
 	g_interrupt = 130;
-	// ft_putstr_fd("\n", 1);
+	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);
-	write(STDOUT_FILENO, "\n", 1);
 	rl_redisplay();
 }
 
-void debug_terminal_state()
+void	sigquit_handler(int signo)
 {
-    struct winsize w;
-    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) != -1) {
-        fprintf(stderr, "Terminal size: %d cols x %d rows\n", w.ws_col, w.ws_row);
-    }
-    
-    // Tester si le terminal supporte les couleurs
-    char *term = getenv("TERM");
-    fprintf(stderr, "TERM: %s\n", term ? term : "undefined");
+	(void)signo;
+}
+
+void	setup_parent_signals(void)
+{
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+void	setup_child_signals(void)
+{
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+}
+
+int	wait_for_child(pid_t pid)
+{
+	int	status;
+	int	exit_code;
+
+	waitpid(pid, &status, 0);
+	
+	if (WIFSIGNALED(status))
+	{
+		int sig = WTERMSIG(status);
+		if (sig == SIGINT)
+		{
+			write(STDOUT_FILENO, "\n", 1);
+			exit_code = 130;
+		}
+		else if (sig == SIGQUIT)
+		{
+			write(STDERR_FILENO, "Quit: 3\n", 8);
+			exit_code = 131;
+		}
+		else
+			exit_code = 128 + sig;
+	}
+	else if (WIFEXITED(status))
+		exit_code = WEXITSTATUS(status);
+	else
+		exit_code = 1;
+	
+	return (exit_code);
 }
 
 int	main(int ac, char **av, char **envp)
@@ -110,19 +144,18 @@ int	main(int ac, char **av, char **envp)
 	int save_exit = 0;
 	t_list *env_list = create_env_list(envp);
 	int status;
-
 	t_cmd **command;
 
 	(void)ac;
 	(void)av;
 	cmds = malloc(sizeof(t_cmd));
     if (!cmds)
-        {return 1;}
+       { return 1;}
 	ft_memset(cmds, 0, sizeof(t_cmd));
 	status = 0;
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, SIG_IGN);
-	// debug_terminal_state();
+	
+	setup_parent_signals();
+	
 	cmds->last_exit_code = 0;
 	while (1)
 	{
@@ -164,9 +197,8 @@ int	main(int ac, char **av, char **envp)
 			free(input);
 			continue;
 		}
-		if (parsing(input, &command, env_list) == -1)
+		if (parsing(input, &command, env_list, cmds->last_exit_code) == -1)
 		{
-			// ft_putstr_fd("Erreur1 : parsing failed\n", 2);
 			cmds->last_exit_code = 2;
 			free(input);
 			continue;
@@ -185,7 +217,6 @@ int	main(int ac, char **av, char **envp)
         cmds->env = env_list;
 		status = check_info(cmds, envp);
 		free(input);
-		
 	}
 	rl_clear_history();
 	return (status);

@@ -30,6 +30,40 @@ static int	extract_env_name(const char *str, int *j, char *env_name)
     return i;
 }
 
+static void copy_exit_code_to_out(int exit_code, char *out, int *k)
+{
+    char exit_str[12]; // Assez pour un int
+    int i = 0;
+    int temp = exit_code;
+    
+    // Cas spécial pour 0
+    if (exit_code == 0)
+    {
+        out[(*k)++] = '0';
+        return;
+    }
+    
+    // Convertir l'entier en string (méthode simple)
+    if (temp < 0)
+    {
+        out[(*k)++] = '-';
+        temp = -temp;
+    }
+    
+    // Extraire les chiffres
+    int digit_count = 0;
+    int temp_copy = temp;
+    while (temp_copy > 0)
+    {
+        exit_str[digit_count++] = (temp_copy % 10) + '0';
+        temp_copy /= 10;
+    }
+    
+    // Copier les chiffres dans l'ordre inverse
+    for (i = digit_count - 1; i >= 0; i--)
+        out[(*k)++] = exit_str[i];
+}
+
 // Gère l'expansion d'une variable d'environnement
 int	handle_env_variable(t_cmd *command, char *str, char *out, int *j, int *k)
 {
@@ -41,8 +75,8 @@ int	handle_env_variable(t_cmd *command, char *str, char *out, int *j, int *k)
     if (str[*j] == '?')
     {
         (*j)++;
-        out[(*k)++] = '$';
-        out[(*k)++] = '?';
+        // CHANGEMENT: copier l'exit code au lieu de "$?"
+        copy_exit_code_to_out(command->data->lec_save, out, k);
         return 0;
     }
     name_len = extract_env_name(str, j, env_name);
