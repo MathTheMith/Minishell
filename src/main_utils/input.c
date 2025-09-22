@@ -1,0 +1,135 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   input.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/11 15:03:04 by tfournie          #+#    #+#             */
+/*   Updated: 2025/09/18 07:40:57 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+static int	check_input_conditions(char *input, t_cmd *cmds)
+{
+	if ((input[0] == '!' && input[1] == '\0'))
+	{
+		cmds->last_exit_code = 1;
+		return (1);
+	}
+	if ((input[0] == ':' && input[1] == '\0'))
+	{
+		cmds->last_exit_code = 0;
+		return (1);
+	}
+	if (input[0] == '\0')
+		return (1);
+	add_history(input);
+	if (input[0] == '~' && input[1] == '\0')
+	{
+		cmds->last_exit_code = 126;
+		ft_putstr_fd("minishell: Is a directory\n", 2);
+		return (1);
+	}
+	return (0);
+}
+
+static char	*get_and_check_input(t_cmd *cmds)
+{
+	char	*prompt;
+	char	*input;
+
+	prompt = build_prompt(cmds);
+	if (!prompt)
+		return (NULL);
+	input = readline(prompt);
+	free(prompt);
+	if (g_interrupt == 130)
+	{
+		cmds->last_exit_code = 130;
+		g_interrupt = 0;
+	}
+	if (!input)
+		return (NULL);
+	if (check_input_conditions(input, cmds))
+	{
+		free(input);
+		return (get_and_check_input(cmds));
+	}
+	return (input);
+}
+
+static void	free_all_helper(t_cmd *current, int i)
+{
+	if (current->args)
+	{
+		while (i < current->nb_args)
+		{
+			if (current->args[i])
+				free(current->args[i]);
+			i++;
+		}
+		free(current->args);
+	}
+	if (current->quoted)
+		free(current->quoted);
+	if (current->infile)
+		free(current->infile);
+	if (current->outfile)
+		free(current->outfile);
+}
+
+void	free_all(t_cmd **command, char *input)
+{
+	t_cmd	*current;
+	t_cmd	*next;
+	int		i;
+
+	if (input)
+		free(input);
+	if (!command || !*command)
+		return ;
+	current = *command;
+	while (current)
+	{
+		i = 0;
+		next = current->next;
+		free_all_helper(current, i);
+		current = next;
+		free(current);
+	}
+	*command = NULL;
+}
+
+int	process_input_loop(t_cmd *cmds, t_list *env_list)
+{
+	int		status;
+	char	*input;
+	t_cmd	**command;
+	char	**current_envp;
+
+	status = 0;
+	while (1)
+	{
+		input = get_and_check_input(cmds);
+		command = NULL;
+		if (process_a(input))
+			break ;
+		if (parsing(input, &command, env_list, cmds->last_exit_code) == -1)
+			cmds->last_exit_code = process_lst(command, 2);
+		else
+		{
+			current_envp = env_list_to_envp(env_list);
+			if (current_envp)
+				status = process(&cmds, command, env_list, current_envp);
+			else
+				cmds->last_exit_code = process_lst(command, 1);
+		}
+		process_c(command);
+	}
+	if (cmds)
+		free_all_cmds(cmds, 1);
+	return (status);
+}

@@ -1,15 +1,3 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/05/26 15:52:09 by tfournie          #+#    #+#              #
-#    Updated: 2025/09/07 10:54:35 by marvin           ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 CC = cc
 CFLAGS = -g -Wall -Wextra -Werror -MMD -MP
 
@@ -26,40 +14,86 @@ SRC_PATH = src
 OBJ_DIR = build
 
 SRC_FILES = main.c \
+			\
+			main_utils/promp.c \
+			main_utils/signaux.c \
+			main_utils/input.c \
+			main_utils/input_utils.c \
+			main_utils/input_process_utils.c \
+			main_utils/promp_length.c \
+			main_utils/free_cmd.c \
+			main_utils/free_args.c \
+			\
+			\
+			parsing/check_invalid/check_invalid.c \
+			parsing/check_invalid/check_middle.c \
+			parsing/check_invalid/check_start.c \
+			parsing/check_invalid/print_error.c \
+			\
+			parsing/debug/print.c \
+			\
+			parsing/init_parsing/init_cmd.c \
+			parsing/init_parsing/init_one_cmd.c \
+			parsing/init_parsing/init_cmd_utils.c \
+			parsing/init_parsing/init_cmd_free.c \
+			parsing/init_parsing/manage_args.c \
+			parsing/init_parsing/pipes.c \
+			parsing/init_parsing/pipes_utils.c \
+			parsing/init_parsing/spc_redir.c \
+			parsing/init_parsing/redir_syntax.c \
+			\
+			parsing/redirections/infile.c \
+			parsing/redirections/outfile.c \
+			\
+			parsing/smart_split/env_expansion.c \
+			parsing/smart_split/env_utils.c \
+			parsing/smart_split/get_arg_length.c \
+			parsing/smart_split/manage_quote.c \
+			parsing/smart_split/smart_split_and_parse.c \
+			parsing/smart_split/smart_split_extract.c \
+			parsing/smart_split/smart_split_utils_helper.c \
+			parsing/smart_split/smart_split_utils.c \
+			\
 			parsing/parsing.c \
-			parsing/init_struct.c \
-			parsing/init_struct_utils.c \
-			parsing/print.c \
-			parsing/manage_args.c \
-			parsing/manage_quote.c \
-			parsing/smart_split_utils.c \
-			parsing/smart_split_and_parse.c \
-			parsing/check_invalid.c \
-			exec/exec.c \
-            exec/exec_cmd_utils.c \
-            exec/exec_redirections.c \
-            exec/exec_process.c \
-            exec/exec_main.c \
-            exec/exec_pipeline_utils.c \
-            exec/exec_pipeline_child.c \
-            exec/exec_pipeline.c \
-			exec/path_validation.c \
-			exec/path_search.c \
-			exec/path_main.c \
-            exec/free_cmd.c \
-			exec/args_input.c \
-			exec/redirect_expansion.c \
-			exec/redirect_validation.c \
-			exec/redirect_input_output.c \
-			exec/redirect_heredoc.c \
-			exec/redirect_main.c \
+			\
+			\
+			exec/exec_utils/exec_cmd_utils_helper.c \
+            exec/exec_utils/exec_cmd_utils.c \
+            exec/exec_utils/exec_redirections.c \
+            exec/exec_utils/exec_process.c \
+            exec/exec_utils/exec_main.c \
+            exec/exec_utils/exec_pipeline_utils.c \
+            exec/exec_utils/exec_pipeline_child.c \
+            exec/exec_utils/exec_pipeline.c \
+			\
+			exec/path/path_validation.c \
+			exec/path/path_search.c \
+			exec/path/path_main.c \
+			\
+			exec/redirect/redirect_expansion.c \
+			exec/redirect/redirect_validation.c \
+			exec/redirect/redirect_input_output.c \
+			exec/redirect/redirect_heredoc.c \
+			exec/redirect/redirect_main.c \
+			\
             exec/$(BUILTINS_PATH)/ft_cd.c \
+			exec/$(BUILTINS_PATH)/ft_cd_utils.c \
             exec/$(BUILTINS_PATH)/ft_echo.c \
+			exec/$(BUILTINS_PATH)/ft_echo_utils.c \
             exec/$(BUILTINS_PATH)/ft_env.c \
             exec/$(BUILTINS_PATH)/ft_exit.c \
-            exec/$(BUILTINS_PATH)/ft_export.c \
+            exec/$(BUILTINS_PATH)/export/env_array.c \
+			exec/$(BUILTINS_PATH)/export/env_list.c \
+			exec/$(BUILTINS_PATH)/export/env_sort.c \
+			exec/$(BUILTINS_PATH)/export/expand_exit_code.c \
+			exec/$(BUILTINS_PATH)/export/export_print.c \
+			exec/$(BUILTINS_PATH)/export/export_utils.c \
+			exec/$(BUILTINS_PATH)/export/export_var.c \
+			exec/$(BUILTINS_PATH)/export/ft_export.c \
             exec/$(BUILTINS_PATH)/ft_pwd.c \
             exec/$(BUILTINS_PATH)/ft_unset.c \
+			\
+			exec/exec.c \
 
 SRC = $(addprefix $(SRC_PATH)/,$(SRC_FILES))
 OBJ = $(addprefix $(OBJ_DIR)/,$(SRC_FILES:.c=.o))

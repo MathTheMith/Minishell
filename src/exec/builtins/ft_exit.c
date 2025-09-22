@@ -1,113 +1,87 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   ft_exit.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/04 00:57:24 by marvin            #+#    #+#             */
-/*   Updated: 2025/06/04 00:57:24 by marvin           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-#include <limits.h>
-
-int ft_atoll_safe(const char *str, long long *out)
+void	cleanup_and_exit(t_cmd *cmds, int exit_code)
 {
-    unsigned long long result = 0;
-    int sign = 1;
-    int i = 0;
-
-    *out = 0;
-    
-    while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
-        i++;
-
-    if (str[i] == '-' || str[i] == '+')
-    {
-        if (str[i] == '-')
-            sign = -1;
-        i++;
-    }
-
-    if (!(str[i] >= '0' && str[i] <= '9'))
-        return 0;
-
-    while (str[i] >= '0' && str[i] <= '9')
-    {
-        int digit = str[i] - '0';
-        if (sign == 1)
-        {
-            if (result > (unsigned long long)(LLONG_MAX - digit) / 10)
-                return 0;
-        }
-        else
-        {
-            if (result > ((unsigned long long)LLONG_MAX + 1 - digit) / 10)
-                return 0;
-        }
-        result = result * 10 + digit;
-        i++;
-    }
-    if (sign == -1)
-        *out = -(long long)result;
-    else
-        *out = (long long)result;
-
-    return 1;
+	if (cmds)
+	{
+		if (cmds->env)
+		{
+			free_env_list(cmds->env);
+		}
+		free_all_cmds(cmds, 1);
+	}
+	rl_clear_history();
+	exit(exit_code);
 }
 
-
-void exit_input(t_cmd *cmds)
+static int	validate_exit_args(t_cmd *cmds, long long *num)
 {
-    long long num;
-
-    if (!cmds || !cmds->args || !cmds->args[0])
-        return;
-
-    if (isatty(STDIN_FILENO))
-        ft_putstr_fd("exit\n", 1);
-
-    if (cmds->args[1])
-    {
-        if (!ft_atoll_safe(cmds->args[1], &num))
-        {
-            ft_putstr_fd("minishell: exit: ", 2);
-            ft_putstr_fd(cmds->args[1], 2);
-            ft_putstr_fd(": numeric argument required\n", 2);
-            exit(2);
-        }
-        if (cmds->args[2])
-        {
-            ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-            cmds->last_exit_code = 1;
-            return;
-        }
-        exit((unsigned char)(num % 256));
-    }
-    exit(cmds->last_exit_code);
+	if (cmds->args[1])
+	{
+		if (!ft_atoll_safe(cmds->args[1], num))
+		{
+			ft_putstr_fd("minishell: exit: ", 2);
+			ft_putstr_fd(cmds->args[1], 2);
+			ft_putstr_fd(": numeric argument required\n", 2);
+			return (2);
+		}
+		if (cmds->args[2])
+		{
+			ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+			return (1);
+		}
+		return ((unsigned char)(*num % 256));
+	}
+	return (cmds->last_exit_code);
 }
 
-void exit_input_pipeline(t_cmd *cmds)
+void	exit_input(t_cmd *cmds, char **envp)
 {
-    long long num;
+	long long	num;
+	int			exit_code;
 
-    if (!cmds->args[1])
-        exit(0);
+	num = 0;
+	if (!cmds || !cmds->args || !cmds->args[0])
+		return ;
+	if (isatty(STDIN_FILENO))
+		ft_putstr_fd("exit\n", 1);
+	exit_code = validate_exit_args(cmds, &num);
+	if (envp)
+		free_string_array(envp);
+	cleanup_and_exit(cmds, exit_code);
+}
 
-    if (!ft_atoll_safe(cmds->args[1], &num))
-    {
-        ft_putstr_fd("minishell: exit: ", 2);
-        ft_putstr_fd(cmds->args[1], 2);
-        ft_putstr_fd(": numeric argument required\n", 2);
-        exit(2);
-    }
-    if (cmds->args[2])
-    {
-        ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-        exit(1);
-    }
-    exit((unsigned char)(num % 256));
+void	cleanup_child_process(char **envp, t_cmd *cmds, int exit_code)
+{
+	if (envp)
+		free_string_array(envp);
+	if (cmds->env)
+		free_env_list(cmds->env);
+	if (cmds)
+		free_all_cmds(cmds, 0);
+	rl_clear_history();
+	exit(exit_code);
+}
+
+void	exit_input_pipeline(t_cmd *cmds, char **envp)
+{
+	long long	num;
+
+	if (!cmds->args[1])
+	{
+		cleanup_child_process(envp, cmds, 0);
+	}
+	if (!ft_atoll_safe(cmds->args[1], &num))
+	{
+		ft_putstr_fd("minishell: exit: ", 2);
+		ft_putstr_fd(cmds->args[1], 2);
+		ft_putstr_fd(": numeric argument required\n", 2);
+		cleanup_child_process(envp, cmds, 2);
+	}
+	if (cmds->args[2])
+	{
+		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
+		cleanup_child_process(envp, cmds, 1);
+	}
+	cleanup_child_process(envp, cmds, (unsigned char)(num % 256));
 }

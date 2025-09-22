@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/26 16:22:46 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/02 12:15:16 by tfournie         ###   ########.fr       */
+/*   Created: 2025/09/11 14:05:18 by tfournie          #+#    #+#             */
+/*   Updated: 2025/09/15 19:51:03 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "check_invalid.h"
+#include "init_parsing.h"
 #include "minishell.h"
 
-int parsing(char *input, t_cmd ***command, t_list *env_list, int lec)
+int	parsing(char *input, t_cmd ***command, t_list *env_list, int lec)
 {
-	t_data *data;
+	t_data	*data;
 
 	if (check_invalid(input) == EXIT_FAILURE)
 		return (-1);

@@ -3,134 +3,99 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/04 00:57:17 by marvin            #+#    #+#             */
-/*   Updated: 2025/06/04 00:57:17 by marvin           ###   ########.fr       */
+/*   Created: 2025/09/11 14:02:05 by tfournie          #+#    #+#             */
+/*   Updated: 2025/09/11 14:02:06 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "ft_cd.h"
+#include "ft_echo.h"
+
+static int	validate_cd_args(t_cmd *cmds)
+{
+	int	arg_count;
+
+	arg_count = 0;
+	if (cmds->args)
+	{
+		while (cmds->args[arg_count + 1])
+			arg_count++;
+	}
+	if (arg_count > 1)
+	{
+		ft_putstr_fd("cd: too many arguments\n", 2);
+		cmds->last_exit_code = 1;
+		return (1);
+	}
+	return (0);
+}
+
+static int	save_current_dir(t_cd_data *data, t_cmd *cmds)
+{
+	if (!getcwd(data->oldpwd, sizeof(data->oldpwd)))
+	{
+		perror("getcwd");
+		cmds->last_exit_code = 1;
+		return (1);
+	}
+	return (0);
+}
+
+static char	*get_target_dir(t_cmd *cmds)
+{
+	char	*dir;
+
+	if (!cmds->args[1])
+	{
+		dir = get_env_value(cmds->env, "HOME");
+		if (!dir)
+		{
+			ft_putstr_fd("cd: HOME not set\n", 2);
+			cmds->last_exit_code = 1;
+			return (NULL);
+		}
+	}
+	else
+		dir = cmds->args[1];
+	dir = expand_tilde(dir, cmds);
+	if (!dir)
+		return (NULL);
+	dir = resolve_env_var(dir, cmds);
+	return (dir);
+}
+
+static int	change_directory(char *dir, t_cmd *cmds)
+{
+	if (chdir(dir) != 0)
+	{
+		perror("cd");
+		cmds->last_exit_code = 1;
+		return (1);
+	}
+	return (0);
+}
 
 void	cd_input(t_cmd *cmds)
 {
-    char *dir;
-    char cwd[1000];
-    char oldpwd[1000];
-	char *resolved_dir;
-	int arg_count = 0;
+	t_cd_data	data;
+	char		*target_dir;
 
-	resolved_dir = NULL;
-    if (cmds->args)
-    {
-        while (cmds->args[arg_count + 1])
-            arg_count++;
-    }
-    
-    if (arg_count > 1)
-    {
-        ft_putstr_fd("cd: too many arguments\n", 2);
-        cmds->last_exit_code = 1;
-        return;
-    }
-    
-    if (!getcwd(oldpwd, sizeof(oldpwd)))
-    {
-        perror("getcwd");
-        cmds->last_exit_code = 1;
-        return;
-    }
-	if (!cmds->args[1]) {
-	    dir = get_env_value(cmds->env, "HOME");
-	    if (!dir) {
-	        ft_putstr_fd("cd: HOME not set\n", 2);
-	        cmds->last_exit_code = 1;
-	        return;
-	    }
-	}
-	else
-		{dir = cmds->args[1];}
-	if (dir[0] == '~') {
-	    char *home = get_env_value(cmds->env, "HOME");
-	    if (!home) {
-	        ft_putstr_fd("cd: HOME not set\n", 2);
-	        cmds->last_exit_code = 1;
-	        return;
-	    }
-	    if (dir[1] == '\0')
-	        dir = home;
-	    else if (dir[1] == '/')
-	        dir = ft_strjoin(home, dir + 1);
-}
-	if (dir && dir[0] == '$')
-    {
-        resolved_dir = get_env_value(cmds->env, dir + 1); 
-        if (resolved_dir)
-        {
-            ft_putstr_fd("cd: too many arguments\n", 2);
-            cmds->last_exit_code = 1;
-            return;
-        }
-    }
-    if (chdir(dir) != 0)
-    {
-        perror("cd");
-        cmds->last_exit_code = 1;
-        return;
-    }
-
-    if (getcwd(cwd, sizeof(cwd)))
-    {
-        add_to_env(&cmds->env, "OLDPWD", oldpwd);
-        add_to_env(&cmds->env, "PWD", cwd);
-    }
-    cmds->last_exit_code = 0;
-}
-
-void add_to_env(t_list **env, char *name, char *value)
-{
-	t_list	*tmp;
-	char	*new_var;
-	size_t	name_len;
-	size_t	value_len;
-	t_list	*new_node;
-
-	name_len = strlen(name);
-	value_len = strlen(value);
-
-	new_var = malloc(name_len + value_len + 2);
-	if (!new_var)
-		return;
-
-	strcpy(new_var, name);
-	new_var[name_len] = '=';
-	strcpy(new_var + name_len + 1, value);
-
-	tmp = *env;
-	while (tmp)
+	data.resolved_dir = NULL;
+	if (validate_cd_args(cmds) != 0)
+		return ;
+	if (save_current_dir(&data, cmds) != 0)
+		return ;
+	target_dir = get_target_dir(cmds);
+	if (!target_dir)
+		return ;
+	if (change_directory(target_dir, cmds) != 0)
+		return ;
+	if (getcwd(data.cwd, sizeof(data.cwd)))
 	{
-		if (strncmp(tmp->str, name, name_len) == 0 && tmp->str[name_len] == '=')
-		{
-			free(tmp->str);
-			tmp->str = new_var;
-			return;
-		}
-		tmp = tmp->next;
-		if (tmp == *env)
-			break;
+		add_to_env(&cmds->env, "OLDPWD", data.oldpwd);
+		add_to_env(&cmds->env, "PWD", data.cwd);
 	}
-
-	new_node = malloc(sizeof(t_list));
-	if (!new_node)
-	{
-		free(new_var);
-		return;
-	}
-	new_node->str = new_var;
-	new_node->next = *env;
-	new_node->prev = (*env)->prev;
-	(*env)->prev->next = new_node;
-	(*env)->prev = new_node;
+	cmds->last_exit_code = 0;
 }
-
-

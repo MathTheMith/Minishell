@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mvachon <mvachon@student.42lyon.fr>        +#+  +:+       +#+         #
+#    By: marvin <marvin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/03/17 13:56:20 by tfournie          #+#    #+#              #
-#    Updated: 2025/06/09 14:35:53 by mvachon          ###   ########lyon.fr    #
+#    Updated: 2025/09/15 18:25:18 by marvin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,8 +16,10 @@ NAME = libft.a
 INCLUDE_PATH = -I../include
 
 SRC = 	ft_atoi.c \
+		ft_atoll.c \
 		ft_bzero.c \
 		ft_calloc.c \
+		ft_is_valid_number.c \
 		ft_isalnum.c \
 		ft_isalpha.c \
 		ft_isascii.c \
@@ -35,6 +37,7 @@ SRC = 	ft_atoi.c \
 		ft_putstr_fd.c \
 		ft_split.c \
 		ft_strchr.c \
+		ft_strcpy.c \
 		ft_strcmp.c \
 		ft_strdup.c \
 		ft_strjoin.c \
@@ -44,6 +47,7 @@ SRC = 	ft_atoi.c \
 		ft_strmapi.c \
 		ft_striteri.c \
 		ft_strncmp.c \
+		ft_strncpy.c \
 		ft_strnstr.c \
 		ft_strrchr.c \
 		ft_substr.c \
@@ -51,7 +55,9 @@ SRC = 	ft_atoi.c \
 		is_numeric.c \
 		ft_tolower.c \
 		ft_toupper.c \
-		ft_strstr.c 
+		ft_strstr.c \
+		ft_realloc.c \
+		ft_readline.c \
 
 OBJ_DIR = obj
 OBJ = $(addprefix $(OBJ_DIR)/,$(SRC:.c=.o))
