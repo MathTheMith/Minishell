@@ -57,16 +57,20 @@ void	cleanup_child_process(char **envp, t_cmd *cmds, int exit_code)
 		free_string_array(envp);
 	if (cmds->env)
 		free_env_list(cmds->env);
+	if (cmds->pids)
+		free(cmds->pids);
+	if (cmds->command_array)
+		free(cmds->command_array);
 	if (cmds)
-		free_all_cmds(cmds, 0);
+		free_all_cmds(cmds, 1);
 	rl_clear_history();
 	exit(exit_code);
 }
 
+
 void	exit_input_pipeline(t_cmd *cmds, char **envp)
 {
 	long long	num;
-
 	if (!cmds->args[1])
 	{
 		cleanup_child_process(envp, cmds, 0);

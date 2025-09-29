@@ -83,15 +83,16 @@ static int	execute_commands_loop(t_cmd *cmds, char **envp, pid_t *pids)
 
 void	exec_pipeline(t_cmd *cmds, char **envp)
 {
-	pid_t	*pids;
 	int		cmd_count;
 
 	cmd_count = count_commands(cmds);
-	pids = allocate_pid_array(cmd_count);
-	if (!pids)
+	cmds->pids = allocate_pid_array(cmd_count);  // <-- ICI
+	cmds->cmd_count = cmd_count;
+	if (!cmds->pids)
 		return ;
-	if (execute_commands_loop(cmds, envp, pids) == -1)
+	if (execute_commands_loop(cmds, envp, cmds->pids) == -1)
 		return ;
-	wait_pipeline_processes(pids, cmd_count, cmds);
-	free(pids);
+	wait_pipeline_processes(cmds->pids, cmd_count, cmds);
+	free(cmds->pids);
+	cmds->pids = NULL;
 }

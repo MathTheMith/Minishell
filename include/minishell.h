@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:05:15 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/29 10:53:09 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 00:32:18 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,9 @@ typedef struct s_cmd
 	char						**envp;
 	t_list						*env;
 	int							last_exit_code;
+	pid_t						*pids;
+	int							cmd_count; 
+		void						*command_array;
 
 }								t_cmd;
 

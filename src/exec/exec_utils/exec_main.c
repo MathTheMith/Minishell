@@ -64,8 +64,7 @@ static void	backup_and_restore_fds(int *stdin_backup, int *stdout_backup,
 	}
 }
 
-static int	process_single_command(t_cmd *current, t_cmd *cmds,
-				t_cmd **command, char **envp)
+static int	process_single_command(t_cmd *current, t_cmd *cmds, char **envp)
 {
 	t_cmd_exec	*cmd;
 	int			ret;
@@ -77,7 +76,7 @@ static int	process_single_command(t_cmd *current, t_cmd *cmds,
 		return (1);
 	if (is_builtin(current))
 	{
-		exec_builtin_free(current, command, envp);
+		exec_builtin(current, envp);
 		return (1);
 	}
 	cmd = init_cmd_exec(cmds, current->args[0], envp);
@@ -88,7 +87,7 @@ static int	process_single_command(t_cmd *current, t_cmd *cmds,
 	return (1);
 }
 
-int	check_args(t_cmd *cmds, t_cmd **command, char **envp)
+int	check_args(t_cmd *cmds, char **envp)
 {
 	t_cmd	*current;
 	int		stdin_backup;
@@ -103,7 +102,7 @@ int	check_args(t_cmd *cmds, t_cmd **command, char **envp)
 			continue ;
 		}
 		backup_and_restore_fds(&stdin_backup, &stdout_backup, 0);
-		process_single_command(current, cmds, command, envp);
+		process_single_command(current, cmds, envp);
 		backup_and_restore_fds(&stdin_backup, &stdout_backup, 1);
 		current = current->next;
 	}

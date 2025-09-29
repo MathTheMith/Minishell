@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_one_cmd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tomm <tomm@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:04:22 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/15 17:15:41 by tomm             ###   ########.fr       */
+/*   Updated: 2025/09/30 00:28:45 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@ static int	allocate_cmd_structure(t_cmd **command, int i)
 	if (command[i] == NULL)
 		return (0);
 	ft_memset(command[i], 0, sizeof(t_cmd));
+	command[i]->pids = NULL;
+	command[i]->cmd_count = 0;
 	return (1);
 }
 

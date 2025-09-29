@@ -16,40 +16,13 @@ int	is_builtin(t_cmd *cmds)
 	return (0);
 }
 
-void	exec_builtin_free(t_cmd *cmds, t_cmd **command, char **envp)
-{
-	if (!cmds || !cmds->args || !cmds->args[0])
-		return ;
-	if (ft_strcmp(cmds->args[0], "exit") == 0)
-	{
-		if (command)
-			exec_builtin_free_helper(command);
-		if (cmds->pipe_in || cmds->pipe_out)
-			exit_input_pipeline(cmds, envp);
-		else
-			exit_input(cmds, envp);
-	}
-	else if (ft_strcmp(cmds->args[0], "cd") == 0)
-		cd_input(cmds);
-	else if (ft_strcmp(cmds->args[0], "echo") == 0)
-		echo_input(cmds);
-	else if (ft_strcmp(cmds->args[0], "export") == 0)
-		export_input(cmds, &(cmds->env));
-	else if (ft_strcmp(cmds->args[0], "unset") == 0)
-		unset_input(cmds, &cmds->env);
-	else if (ft_strcmp(cmds->args[0], "env") == 0)
-		env_input(cmds, envp);
-	else if (ft_strcmp(cmds->args[0], "pwd") == 0)
-		pwd_input(cmds);
-}
-
 void	exec_builtin(t_cmd *cmds, char **envp)
 {
 	if (!cmds || !cmds->args || !cmds->args[0])
 		return ;
 	if (ft_strcmp(cmds->args[0], "exit") == 0)
 	{
-		if (cmds->pipe_in)
+		if (cmds->pipe_in || cmds->pipe_out)
 			exit_input_pipeline(cmds, envp);
 		else
 			exit_input(cmds, envp);

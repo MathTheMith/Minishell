@@ -27,8 +27,5 @@ void	exec_builtin(t_cmd *cmds, char **envp);
 /* Path and command validation */
 int		is_path_command(const char *cmd);
 void	handle_path_error(t_cmd *cmds, char *cmd_name);
-void	exec_builtin_free(t_cmd *cmds, t_cmd **command, char **envp);
-
-void	exec_builtin_free_helper(t_cmd **command);
 
 #endif

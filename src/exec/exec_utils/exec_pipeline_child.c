@@ -15,36 +15,31 @@
 #include "path_exec.h"
 #include "redirections.h"
 
-static void	free_cleaned_args_and_exit(char **cleaned_args, int exit_code)
-{
-	int	i;
-
-	if (cleaned_args)
-	{
-		i = 0;
-		while (cleaned_args[i])
-		{
-			free(cleaned_args[i]);
-			i++;
-		}
-		free(cleaned_args);
-	}
-	exit(exit_code);
-}
-
 void	handle_builtin_in_pipeline(t_cmd *current, char **cleaned_args,
 			t_cmd *cmds, char **envp)
 {
-	t_cmd	temp_cmd;
+	int		exit_code;
+	char	**original_args;
 
-	temp_cmd = *current;
-	temp_cmd.args = cleaned_args;
-	temp_cmd.pipe_in = (void *)1;
-	exec_builtin(&temp_cmd, envp);
-	free_all_cmds(cmds, 0);
-	free_string_array(cmds->envp);
+	original_args = current->args;
+	current->args = cleaned_args;
+	current->pipe_in = (void *)1;
+	
+	exec_builtin(current, envp);
+	exit_code = cmds->last_exit_code;
+	
+	current->args = original_args;
+	
+	free_cleaned_args(cleaned_args);
+	free_string_array(envp);
 	free_env_list(cmds->env);
-	free_cleaned_args_and_exit(cleaned_args, cmds->last_exit_code);
+	if (cmds->pids)           // AJOUT
+		free(cmds->pids);
+	if (cmds->command_array)
+		free(cmds->command_array);
+	free_all_cmds(cmds, 1);
+	rl_clear_history();
+	exit(exit_code);
 }
 
 void	handle_external_in_pipeline(t_cmd *cmds, char **envp,
@@ -57,17 +52,34 @@ void	handle_external_in_pipeline(t_cmd *cmds, char **envp,
 	{
 		ft_putstr_fd(cleaned_args[0], 2);
 		ft_putstr_fd(": command not found \n", 2);
-		free_string_array(cmds->envp);
+		free_cleaned_args(cleaned_args);
+		free_string_array(envp);
 		free_env_list(cmds->env);
-		free_cleaned_args_and_exit(cleaned_args, 127);
+		if (cmds->pids)
+			free(cmds->pids);
+		if (cmds->command_array)
+			free(cmds->command_array);
+		free_all_cmds(cmds, 1);
+		rl_clear_history();
+		exit(127);
 	}
+	
 	execve(path, cleaned_args, envp);
 	perror("execve");
 	free(path);
-	free_string_array(cmds->envp);
+	free_cleaned_args(cleaned_args);
+	free_string_array(envp);
 	free_env_list(cmds->env);
-	free_cleaned_args_and_exit(cleaned_args, 126);
+	if (cmds->pids)
+		free(cmds->pids);
+	free_all_cmds(cmds, 1);
+	if (cmds->command_array)
+		free(cmds->command_array);
+	rl_clear_history();
+	exit(126);
 }
+
+
 
 void	exec_pipeline_child(t_cmd *current, t_cmd *cmds,
 			int prev_fd, int *pipefd)
@@ -76,15 +88,30 @@ void	exec_pipeline_child(t_cmd *current, t_cmd *cmds,
 
 	setup_pipes(prev_fd, pipefd, current);
 	if (handle_redirections(current) < 0)
+	{
+		free_string_array(cmds->envp);
+		free_env_list(cmds->env);
+		if (cmds->pids)
+			free(cmds->pids);
+		free_all_cmds(cmds, 1);
+		rl_clear_history();
 		exit(2);
+	}
+	
 	cleaned_args = remove_redirections(current->args);
 	if (!cleaned_args)
-		exit(1);
-	if (is_builtin(current))
 	{
-		handle_builtin_in_pipeline(current, cleaned_args, cmds, cmds->envp);
-		free_all_cmds(current, 1);
+		free_string_array(cmds->envp);
+		free_env_list(cmds->env);
+		if (cmds->pids)
+			free(cmds->pids);
+		free_all_cmds(cmds, 1);
+		rl_clear_history();
+		exit(1);
 	}
+	
+	if (is_builtin(current))
+		handle_builtin_in_pipeline(current, cleaned_args, cmds, cmds->envp);
 	else
 		handle_external_in_pipeline(cmds, cmds->envp, cleaned_args);
 }

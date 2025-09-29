@@ -26,7 +26,7 @@ void		exec_child_process(t_cmd_exec *cmd_exec, char **envp,
 void		handle_exec_error(char **args, char *path);
 
 /* Main execution functions */
-int			check_args(t_cmd *cmds, t_cmd **command, char **envp);
+int			check_args(t_cmd *cmds, char **envp);
 void		exec_pipeline(t_cmd *cmds, char **envp);
 
 #endif
