@@ -28,19 +28,23 @@ static char	*process_heredoc_line(char *line, int quoted, t_cmd *cmd)
 static char	*append_to_buffer(char **buffer, size_t *bufsize, char *expanded)
 {
 	size_t	oldsize;
+	size_t	exp_len;
 	char	*new_buffer;
 
 	oldsize = *bufsize;
-	*bufsize += ft_strlen(expanded) + 1;
-	new_buffer = ft_realloc(*buffer, *bufsize, *bufsize + 1);
+	exp_len = ft_strlen(expanded);
+	*bufsize += exp_len + 1;
+	new_buffer = ft_realloc(*buffer, oldsize + 1, *bufsize + 1);
 	if (!new_buffer)
 		return (NULL);
 	*buffer = new_buffer;
-	ft_memcpy(*buffer + oldsize, expanded, ft_strlen(expanded));
-	(*buffer)[oldsize + ft_strlen(expanded)] = '\n';
+	ft_memcpy(*buffer + oldsize, expanded, exp_len);
+	(*buffer)[oldsize + exp_len] = '\n';
 	(*buffer)[*bufsize] = '\0';
+
 	return (*buffer);
 }
+
 
 char	*read_heredoc_line(char *delimiter, t_cmd *cmd, char **buffer,
 			size_t *bufsize)
@@ -94,19 +98,17 @@ int	handle_heredoc(t_cmd *cmd, char *delimiter)
 {
 	char			*heredoc_buffer;
 	size_t			heredoc_bufsize;
-	void			(*old_sigint)(int);
 
 	heredoc_buffer = NULL;
 	heredoc_bufsize = 0;
-	old_sigint = signal(SIGINT, SIG_DFL);
 	if (!read_heredoc_line(delimiter, cmd, &heredoc_buffer, &heredoc_bufsize))
 	{
 		free(heredoc_buffer);
-		signal(SIGINT, old_sigint);
+		signal(SIGINT, sigint_handler);
 		cmd->last_exit_code = 130;
 		return (-1);
 	}
-	signal(SIGINT, old_sigint);
+	signal(SIGINT, sigint_handler);
 	if (setup_heredoc_pipe(heredoc_buffer, heredoc_bufsize, cmd) < 0)
 	{
 		free(heredoc_buffer);

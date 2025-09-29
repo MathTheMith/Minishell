@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 18:22:36 by marvin            #+#    #+#             */
-/*   Updated: 2025/09/18 07:35:36 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/29 14:37:21 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void	free_all_cmds(t_cmd *cmds, int is_free)
 	t_data	*data_to_free;
 
 	data_to_free = NULL;
+
 	if (cmds && cmds->data)
 		data_to_free = cmds->data;
 	while (cmds)

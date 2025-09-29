@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:02:03 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 14:02:04 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/09/29 15:17:57 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 char	*expand_tilde(char *dir, t_cmd *cmds)
 {
 	char	*home;
-
+	char *temp;
 	if (dir[0] != '~')
 		return (dir);
 	home = get_env_value(cmds->env, "HOME");
@@ -29,7 +29,12 @@ char	*expand_tilde(char *dir, t_cmd *cmds)
 	if (dir[1] == '\0')
 		return (home);
 	else if (dir[1] == '/')
-		return (ft_strjoin(home, dir + 1));
+	{
+		temp = ft_strjoin(home, dir + 1);
+		if (!temp)
+			return (NULL);
+		return (temp);
+	}
 	return (dir);
 }
 

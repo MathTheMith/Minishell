@@ -22,6 +22,8 @@ char	*build_full_path(char *dir, char *cmd)
 		return (NULL);
 	full_path = ft_strjoin(tmp, cmd);
 	free(tmp);
+	if (!full_path)
+		return (NULL);
 	return (full_path);
 }
 

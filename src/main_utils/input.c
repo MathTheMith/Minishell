@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:03:04 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/18 07:40:57 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/29 14:45:34 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,10 @@ int	process_input_loop(t_cmd *cmds, t_list *env_list)
 		if (process_a(input))
 			break ;
 		if (parsing(input, &command, env_list, cmds->last_exit_code) == -1)
+		{
 			cmds->last_exit_code = process_lst(command, 2);
+			free(input);
+		}
 		else
 		{
 			current_envp = env_list_to_envp(env_list);

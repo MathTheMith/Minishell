@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:05:15 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/18 04:35:14 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/29 10:53:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void							sigquit_handler(int signo);
 void							cleanup_and_exit_with_command(t_cmd *cmds,
 									t_cmd **command, int exit_code);
 void free_all_before_exec(t_cmd *current_cmd);
+void	sigint_handler(int signo);
 size_t							calculate_prompt_length(char *code,
 									char *start);
 void							update_command_data(t_cmd **cmds,

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:03:21 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/18 08:52:18 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/29 15:05:11 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,9 @@ int check_info(t_cmd *cmds, t_cmd **command, char **envp)
     if (cmds && cmds->next)
         exec_pipeline(cmds, envp);
     else
-        {check_args(cmds, command, envp);}
-
+    {
+        check_args(cmds, command, envp);
+    }
 	free_envp(envp);
     return (1);
 }

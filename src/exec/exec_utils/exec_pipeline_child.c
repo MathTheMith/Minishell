@@ -41,6 +41,9 @@ void	handle_builtin_in_pipeline(t_cmd *current, char **cleaned_args,
 	temp_cmd.args = cleaned_args;
 	temp_cmd.pipe_in = (void *)1;
 	exec_builtin(&temp_cmd, envp);
+	free_all_cmds(cmds, 0);
+	free_string_array(cmds->envp);
+	free_env_list(cmds->env);
 	free_cleaned_args_and_exit(cleaned_args, cmds->last_exit_code);
 }
 
@@ -54,11 +57,15 @@ void	handle_external_in_pipeline(t_cmd *cmds, char **envp,
 	{
 		ft_putstr_fd(cleaned_args[0], 2);
 		ft_putstr_fd(": command not found \n", 2);
+		free_string_array(cmds->envp);
+		free_env_list(cmds->env);
 		free_cleaned_args_and_exit(cleaned_args, 127);
 	}
 	execve(path, cleaned_args, envp);
 	perror("execve");
 	free(path);
+	free_string_array(cmds->envp);
+	free_env_list(cmds->env);
 	free_cleaned_args_and_exit(cleaned_args, 126);
 }
 

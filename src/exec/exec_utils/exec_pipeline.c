@@ -91,10 +91,7 @@ void	exec_pipeline(t_cmd *cmds, char **envp)
 	if (!pids)
 		return ;
 	if (execute_commands_loop(cmds, envp, pids) == -1)
-	{
-		free(pids);
 		return ;
-	}
 	wait_pipeline_processes(pids, cmd_count, cmds);
 	free(pids);
 }
