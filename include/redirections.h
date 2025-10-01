@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:01:26 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/18 04:34:50 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 02:38:24 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,5 @@ int			is_delimiter_quoted(char *delimiter);
 int			handle_redirections(t_cmd *cmd);
 char		*expand_result(t_expand *ctx);
 char		*get_env_value(t_list *env, const char *name);
-
 
 #endif

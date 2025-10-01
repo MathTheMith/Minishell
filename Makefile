@@ -57,7 +57,6 @@ SRC_FILES = main.c \
 			parsing/parsing.c \
 			\
 			\
-			exec/exec_utils/exec_cmd_utils_helper.c \
             exec/exec_utils/exec_cmd_utils.c \
             exec/exec_utils/exec_redirections.c \
             exec/exec_utils/exec_process.c \

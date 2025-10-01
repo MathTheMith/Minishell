@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/15 18:22:32 by marvin            #+#    #+#             */
-/*   Updated: 2025/09/18 04:45:41 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 02:42:33 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,6 @@ static void	free_cmd_array(t_cmd **command, int failed_idx)
 	int	i;
 
 	j = 0;
-	if (!command)
-		return ;
 	while (j < failed_idx)
 	{
 		if (command[j])
@@ -73,7 +71,8 @@ void	free_failed_init(t_cmd **command, int failed_idx, char **cmd_pipe)
 {
 	int	j;
 
-	free_cmd_array(command, failed_idx);
+	if (command)
+		free_cmd_array(command, failed_idx);
 	j = -1;
 	if (!cmd_pipe)
 		return ;

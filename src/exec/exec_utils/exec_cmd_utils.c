@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_cmd_utils.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/30 02:40:08 by marvin            #+#    #+#             */
+/*   Updated: 2025/09/30 02:47:47 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "exec_cmd_utils.h"
 #include "export.h"
 #include "ft_cd.h"
@@ -39,6 +51,24 @@ void	exec_builtin(t_cmd *cmds, char **envp)
 		env_input(cmds, envp);
 	else if (ft_strcmp(cmds->args[0], "pwd") == 0)
 		pwd_input(cmds);
+}
+
+void	free_all_before_exec(t_cmd *current_cmd)
+{
+	t_cmd	*temp;
+
+	temp = current_cmd;
+	while (temp)
+	{
+		free_string_array(temp->args);
+		if (temp->quoted)
+			free(temp->quoted);
+		if (temp->infile)
+			free(temp->infile);
+		if (temp->outfile)
+			free(temp->outfile);
+		temp = temp->next;
+	}
 }
 
 int	is_path_command(const char *cmd)

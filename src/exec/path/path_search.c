@@ -22,6 +22,7 @@ char	*build_full_path(char *dir, char *cmd)
 		return (NULL);
 	full_path = ft_strjoin(tmp, cmd);
 	free(tmp);
+	tmp = NULL;
 	if (!full_path)
 		return (NULL);
 	return (full_path);
@@ -61,6 +62,7 @@ char	*search_in_paths(char *cmd, char **paths)
 		if (check_executable(full_path))
 			return (free_paths(paths), full_path);
 		free(full_path);
+		full_path = NULL;
 		i++;
 	}
 	return (NULL);
@@ -85,6 +87,7 @@ char	*look_for_path(char *cmd, char **paths)
 		if (access(path, F_OK | X_OK) == 0)
 			return (free_paths(paths), path);
 		free(path);
+		path = NULL;
 		i++;
 	}
 	free_paths(paths);
@@ -104,4 +107,5 @@ void	free_paths(char **paths)
 		i++;
 	}
 	free(paths);
+	paths = NULL;
 }

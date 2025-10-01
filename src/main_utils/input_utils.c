@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:09:43 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 14:25:55 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/09/30 16:25:56 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static void	cleanup_envp(char **envp, int up_to_index)
 		i++;
 	}
 	free(envp);
+	envp = NULL;
 }
 
 static int	fill_envp_array(char **envp, t_list *env_list, int count)

@@ -60,22 +60,6 @@ void	handle_exec_error(char **args, char *path)
 	exit(127);
 }
 
-void free_all_before_exec(t_cmd *current_cmd)
-{
-    t_cmd *temp = current_cmd;
-    
-    while (temp) {
-        free_string_array(temp->args);
-        if (temp->quoted)
-            free(temp->quoted);
-        if (temp->infile)
-            free(temp->infile);
-        if (temp->outfile)
-            free(temp->outfile);
-        temp = temp->next;
-    }
-}
-
 void	exec_child_process(t_cmd_exec *cmd_exec, char **envp,
 			char **cleaned_args, t_cmd *cmd)
 {

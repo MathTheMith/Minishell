@@ -41,10 +41,8 @@ static char	*append_to_buffer(char **buffer, size_t *bufsize, char *expanded)
 	ft_memcpy(*buffer + oldsize, expanded, exp_len);
 	(*buffer)[oldsize + exp_len] = '\n';
 	(*buffer)[*bufsize] = '\0';
-
 	return (*buffer);
 }
-
 
 char	*read_heredoc_line(char *delimiter, t_cmd *cmd, char **buffer,
 			size_t *bufsize)

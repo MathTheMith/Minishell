@@ -26,6 +26,7 @@ void	free_cleaned_args(char **cleaned_args)
 		i++;
 	}
 	free(cleaned_args);
+	cleaned_args = NULL;
 }
 
 void	free_clean_args(char **new_args, int j)
@@ -33,4 +34,5 @@ void	free_clean_args(char **new_args, int j)
 	while (--j >= 0)
 		free(new_args[j]);
 	free(new_args);
+	new_args = NULL;
 }

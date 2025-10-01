@@ -6,18 +6,19 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:03:58 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/15 18:53:30 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 02:46:54 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "../libft/libft.h"
 
-void print_data(t_cmd **command)
+void	print_data(t_cmd **command)
 {
- 	// (void)command;
-	int i = 0;
-	int j;
+	int	i;
+	int	j;
+
+	i = 0;
 	printf("Data: \n");
 	printf(" |nb_cmd: %d\n", command[0]->data->nb_cmd);
 	printf(" |input = %s\n\n", command[0]->data->input);

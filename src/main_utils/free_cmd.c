@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   free_cmd.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/15 18:22:36 by marvin            #+#    #+#             */
-/*   Updated: 2025/09/29 14:37:21 by mvachon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "minishell.h"
 #include "path_exec.h"
@@ -16,15 +5,16 @@
 void	free_cmd(t_cmd_exec *cmd)
 {
 	if (!cmd)
-	return ;
+		return ;
 	if (cmd->args)
-	free_paths(cmd->args);
+		free_paths(cmd->args);
 	if (cmd->path)
 	{
 		free(cmd->path);
 		cmd->path = NULL;
 	}
 	free(cmd);
+	cmd = NULL;
 }
 
 void	free_data(t_data *data)
@@ -37,7 +27,9 @@ void	free_data(t_data *data)
 		data->input = NULL;
 	}
 	free(data);
+	data = NULL;
 }
+
 void	free_one_cmd(t_cmd *cmd, int is_free)
 {
 	int	i;
@@ -53,15 +45,28 @@ void	free_one_cmd(t_cmd *cmd, int is_free)
 			i++;
 		}
 		free(cmd->args);
+		cmd->args = NULL;
 	}
 	if (cmd->quoted)
+	{
 		free(cmd->quoted);
+		cmd->quoted = NULL;
+	}
 	if (cmd->infile)
+	{
 		free(cmd->infile);
+		cmd->infile = NULL;
+	}
 	if (cmd->outfile)
+	{
 		free(cmd->outfile);
+		cmd->outfile = NULL;
+	}
 	if (is_free)
+	{
 		free(cmd);
+		cmd = NULL;
+	}
 }
 
 void	free_all_cmds(t_cmd *cmds, int is_free)
@@ -70,7 +75,6 @@ void	free_all_cmds(t_cmd *cmds, int is_free)
 	t_data	*data_to_free;
 
 	data_to_free = NULL;
-
 	if (cmds && cmds->data)
 		data_to_free = cmds->data;
 	while (cmds)
@@ -82,6 +86,7 @@ void	free_all_cmds(t_cmd *cmds, int is_free)
 	if (data_to_free)
 	{
 		free_data(data_to_free);
+		data_to_free = NULL;
 	}
 }
 
@@ -98,4 +103,5 @@ void	free_string_array(char **array)
 		i++;
 	}
 	free(array);
+	array = NULL;
 }

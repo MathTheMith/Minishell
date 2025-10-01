@@ -6,7 +6,7 @@
 /*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:03:04 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/29 14:45:34 by mvachon          ###   ########.fr       */
+/*   Updated: 2025/09/30 17:10:13 by mvachon          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,8 @@ void	free_all(t_cmd **command, char *input)
 	*command = NULL;
 }
 
+
+
 int	process_input_loop(t_cmd *cmds, t_list *env_list)
 {
 	int		status;
@@ -131,7 +133,7 @@ int	process_input_loop(t_cmd *cmds, t_list *env_list)
 				cmds->last_exit_code = process_lst(command, 1);
 		}
 		process_c(command);
-	}
+	}	
 	if (cmds)
 		free_all_cmds(cmds, 1);
 	return (status);

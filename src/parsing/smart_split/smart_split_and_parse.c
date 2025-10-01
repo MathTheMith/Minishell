@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:05:08 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/18 07:35:47 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 02:49:41 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@ void	free_args(char **args, int last_index)
 	free(args);
 }
 
-char **allocate_args(int count)
+char	**allocate_args(int count)
 {
-    char **args = malloc(sizeof(char*) * (count + 1));
-    return args;
+	char	**args;
+
+	args = malloc(sizeof(char *) * (count + 1));
+	return (args);
 }
 
 static char	*extract_single_arg(t_cmd *command, char *str, int *pos,

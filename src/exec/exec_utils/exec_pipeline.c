@@ -86,7 +86,7 @@ void	exec_pipeline(t_cmd *cmds, char **envp)
 	int		cmd_count;
 
 	cmd_count = count_commands(cmds);
-	cmds->pids = allocate_pid_array(cmd_count);  // <-- ICI
+	cmds->pids = allocate_pid_array(cmd_count);
 	cmds->cmd_count = cmd_count;
 	if (!cmds->pids)
 		return ;

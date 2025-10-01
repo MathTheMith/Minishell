@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:05:15 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/30 00:32:18 by marvin           ###   ########.fr       */
+/*   Updated: 2025/09/30 02:38:06 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ typedef struct s_cmd
 	t_list						*env;
 	int							last_exit_code;
 	pid_t						*pids;
-	int							cmd_count; 
-		void						*command_array;
+	int							cmd_count;
+	void						*command_array;
 
 }								t_cmd;
 
@@ -81,11 +81,12 @@ int								check_info(t_cmd *cmds, t_cmd **command,
 									char **envp);
 char							*adjust_path_length(char *start,
 									int term_width);
+void							cleanup_and_exit_child(t_cmd *cmds,
+									char **envp, char **cleaned_args,
+									int exit_code);
 void							sigquit_handler(int signo);
-void							cleanup_and_exit_with_command(t_cmd *cmds,
-									t_cmd **command, int exit_code);
-void free_all_before_exec(t_cmd *current_cmd);
-void	sigint_handler(int signo);
+void							free_all_before_exec(t_cmd *current_cmd);
+void							sigint_handler(int signo);
 size_t							calculate_prompt_length(char *code,
 									char *start);
 void							update_command_data(t_cmd **cmds,

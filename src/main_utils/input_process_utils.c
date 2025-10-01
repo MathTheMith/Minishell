@@ -1,14 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   input_process_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/12 10:08:09 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/29 15:35:25 by mvachon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "minishell.h"
 
@@ -45,21 +35,23 @@ void	free_envp(char **envp)
 		i++;
 	}
 	free(envp);
+	envp = NULL;
 }
 
-void process_c(t_cmd **command)
+void	process_c(t_cmd **command)
 {
-    int i;
-    
-    if (!command)
-        return;
-    
-    i = 0;
-    while (command[i]) {
-        free_one_cmd(command[i], 1);
-        i++;
-    }
-    free(command);
+	int	i;
+
+	if (!command)
+		return ;
+	i = 0;
+	while (command[i])
+	{
+		free_one_cmd(command[i], 1);
+		i++;
+	}
+	free(command);
+	command = NULL;
 }
 
 int	process(t_cmd **cmds, t_cmd **command, t_list *env_list, char **envp)

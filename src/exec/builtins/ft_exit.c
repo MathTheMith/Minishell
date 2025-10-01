@@ -1,18 +1,16 @@
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_exit.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/30 02:39:53 by marvin            #+#    #+#             */
+/*   Updated: 2025/09/30 15:50:30 by mvachon          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void	cleanup_and_exit(t_cmd *cmds, int exit_code)
-{
-	if (cmds)
-	{
-		if (cmds->env)
-		{
-			free_env_list(cmds->env);
-		}
-		free_all_cmds(cmds, 1);
-	}
-	rl_clear_history();
-	exit(exit_code);
-}
+#include "minishell.h"
 
 static int	validate_exit_args(t_cmd *cmds, long long *num)
 {
@@ -46,46 +44,25 @@ void	exit_input(t_cmd *cmds, char **envp)
 	if (isatty(STDIN_FILENO))
 		ft_putstr_fd("exit\n", 1);
 	exit_code = validate_exit_args(cmds, &num);
-	if (envp)
-		free_string_array(envp);
-	cleanup_and_exit(cmds, exit_code);
+	cleanup_and_exit_child(cmds, envp, NULL, exit_code);
 }
-
-void	cleanup_child_process(char **envp, t_cmd *cmds, int exit_code)
-{
-	if (envp)
-		free_string_array(envp);
-	if (cmds->env)
-		free_env_list(cmds->env);
-	if (cmds->pids)
-		free(cmds->pids);
-	if (cmds->command_array)
-		free(cmds->command_array);
-	if (cmds)
-		free_all_cmds(cmds, 1);
-	rl_clear_history();
-	exit(exit_code);
-}
-
 
 void	exit_input_pipeline(t_cmd *cmds, char **envp)
 {
 	long long	num;
 	if (!cmds->args[1])
-	{
-		cleanup_child_process(envp, cmds, 0);
-	}
+		cleanup_and_exit_child(cmds, envp, NULL, 0);
 	if (!ft_atoll_safe(cmds->args[1], &num))
 	{
 		ft_putstr_fd("minishell: exit: ", 2);
 		ft_putstr_fd(cmds->args[1], 2);
 		ft_putstr_fd(": numeric argument required\n", 2);
-		cleanup_child_process(envp, cmds, 2);
+		cleanup_and_exit_child(cmds, envp, NULL, 2);
 	}
 	if (cmds->args[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-		cleanup_child_process(envp, cmds, 1);
+		cleanup_and_exit_child(cmds, envp, NULL, 1);
 	}
-	cleanup_child_process(envp, cmds, (unsigned char)(num % 256));
+	cleanup_and_exit_child(cmds, envp, NULL, (unsigned char)(num % 256));
 }
