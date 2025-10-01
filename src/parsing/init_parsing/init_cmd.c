@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:04:04 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/15 20:38:41 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/01 18:31:53 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ static int	init_commands_loop(t_cmd **command, t_data *data, char **cmd_pipe,
 	{
 		params.i = i;
 		init_cmd(command, &params);
+		// if (!command)
+		// 	return ;
 		if (command[i] == NULL)
 		{
 			free_partial_commands(command, i);

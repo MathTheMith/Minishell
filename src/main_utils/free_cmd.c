@@ -1,4 +1,6 @@
 
+
+
 #include "minishell.h"
 #include "path_exec.h"
 
@@ -42,6 +44,7 @@ void	free_one_cmd(t_cmd *cmd, int is_free)
 		while (cmd->args[i])
 		{
 			free(cmd->args[i]);
+			cmd->args[i] = NULL;
 			i++;
 		}
 		free(cmd->args);

@@ -1,14 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   input.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/11 15:03:04 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/30 17:10:13 by mvachon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "minishell.h"
 
@@ -132,7 +122,7 @@ int	process_input_loop(t_cmd *cmds, t_list *env_list)
 			else
 				cmds->last_exit_code = process_lst(command, 1);
 		}
-		process_c(command);
+		// process_c(command);
 	}	
 	if (cmds)
 		free_all_cmds(cmds, 1);

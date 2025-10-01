@@ -1,14 +1,4 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mvachon <mvachon@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/11 14:05:22 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/30 16:00:13 by mvachon          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+
 
 #include "minishell.h"
 
@@ -71,12 +61,16 @@ int	main(int ac, char **av, char **envp)
 	t_list	*env_list;
 	int		status;
 
-	(void)ac;
 	(void)av;
+	if (ac != 1)
+		return (1);
+	// if (isatty(STDIN_FILENO) == 0 || isatty(STDOUT_FILENO) == 0)
+	// 	return (1);
 	cmds = init_cmds();
 	if (!cmds)
 		return (1);
 	env_list = create_env_list(envp);
+	// if malloc
 	setup_parent_signals();
 	status = process_input_loop(cmds, env_list);
 	rl_clear_history();

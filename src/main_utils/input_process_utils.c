@@ -1,5 +1,4 @@
 
-
 #include "minishell.h"
 
 bool	process_a(char *input)
@@ -62,5 +61,6 @@ int	process(t_cmd **cmds, t_cmd **command, t_list *env_list, char **envp)
 	update_command_data(cmds, command, save_exit, env_list);
 	if (!*cmds)
 		return (0);
-	return (check_info(*cmds, command, envp));
+	process_c(command);
+	return (check_info(*cmds, NULL, envp));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_one_cmd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:04:22 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/30 00:28:45 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/01 16:05:29 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static int	set(t_cmd *cmd, char *processed_cmd, char *original_cmd)
 		return (0);
 	ft_memset(cmd->quoted, 0, sizeof(int) * cmd->nb_args);
 	cmd->args = manage_args(cmd, original_cmd);
+	//check
 	return (1);
 }
 
@@ -70,7 +71,7 @@ void	init_cmd(t_cmd **command, t_cmd_init_params *params)
 		free(command);
 		return ;
 	}
-	setup_basic_fields(command[params->i], params);
+	setup_basic_fields(command[params->i], params);//retour
 	if (!set(command[params->i], processed_cmd, params->cmd_pipe[params->i]))
 	{
 		free(processed_cmd);
