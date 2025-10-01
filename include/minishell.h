@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 15:05:15 by tfournie          #+#    #+#             */
-/*   Updated: 2025/10/01 19:25:39 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/10/02 00:32:52 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,16 +74,18 @@ typedef struct s_cmd
 
 }								t_cmd;
 
+int								execute_command(t_cmd **cmds, t_cmd **command,
+									t_list *env_list, t_data *data_ptr);
 int								parsing(char *input, t_cmd ***command,
 									t_list *env_list, int lec);
 void							print_data(t_cmd **command);
+void							free_args_array(char **args);
+int								handle_parsing_error(t_cmd **command,
+									char *input, t_cmd *cmds);
 int								check_info(t_cmd *cmds, t_cmd **command,
 									char **envp);
 char							*adjust_path_length(char *start,
 									int term_width);
-									
-void	cleanup_and_exit_child_t_cmd(t_cmd *cmds, char **envp,
-				t_cmd **cleaned_args, int exit_code);
 void							cleanup_and_exit_child(t_cmd *cmds,
 									char **envp, char **cleaned_args,
 									int exit_code);

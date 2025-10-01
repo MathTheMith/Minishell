@@ -20,6 +20,7 @@ SRC_FILES = main.c \
 			main_utils/input.c \
 			main_utils/input_utils.c \
 			main_utils/input_process_utils.c \
+			main_utils/input_helpers.c \
 			main_utils/promp_length.c \
 			main_utils/free_cmd.c \
 			main_utils/free_args.c \
@@ -63,6 +64,7 @@ SRC_FILES = main.c \
             exec/exec_utils/exec_main.c \
             exec/exec_utils/exec_pipeline_utils.c \
             exec/exec_utils/exec_pipeline_child.c \
+            exec/exec_utils/exec_pipeline_cleanup.c   \
             exec/exec_utils/exec_pipeline.c \
 			\
 			exec/path/path_validation.c \

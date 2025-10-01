@@ -1,5 +1,14 @@
-
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   free_cmd.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/02 00:15:37 by marvin            #+#    #+#             */
+/*   Updated: 2025/10/02 00:27:08 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 #include "path_exec.h"
@@ -32,22 +41,11 @@ void	free_data(t_data *data)
 	data = NULL;
 }
 
-void	free_one_cmd(t_cmd *cmd, int is_free)
+static void	free_cmd_fields(t_cmd *cmd)
 {
-	int	i;
-
-	if (!cmd)
-		return ;
 	if (cmd->args)
 	{
-		i = 0;
-		while (cmd->args[i])
-		{
-			free(cmd->args[i]);
-			cmd->args[i] = NULL;
-			i++;
-		}
-		free(cmd->args);
+		free_args_array(cmd->args);
 		cmd->args = NULL;
 	}
 	if (cmd->quoted)
@@ -65,6 +63,13 @@ void	free_one_cmd(t_cmd *cmd, int is_free)
 		free(cmd->outfile);
 		cmd->outfile = NULL;
 	}
+}
+
+void	free_one_cmd(t_cmd *cmd, int is_free)
+{
+	if (!cmd)
+		return ;
+	free_cmd_fields(cmd);
 	if (is_free)
 	{
 		free(cmd);
@@ -75,36 +80,11 @@ void	free_one_cmd(t_cmd *cmd, int is_free)
 void	free_all_cmds(t_cmd *cmds, int is_free)
 {
 	t_cmd	*next;
-	t_data	*data_to_free;
 
-	data_to_free = NULL;
-	if (cmds && cmds->data)
-		data_to_free = cmds->data;
 	while (cmds)
 	{
 		next = cmds->next;
 		free_one_cmd(cmds, is_free);
 		cmds = next;
 	}
-	if (data_to_free)
-	{
-		free_data(data_to_free);
-		data_to_free = NULL;
-	}
-}
-
-void	free_string_array(char **array)
-{
-	int	i;
-
-	if (!array)
-		return ;
-	i = 0;
-	while (array[i])
-	{
-		free(array[i]);
-		i++;
-	}
-	free(array);
-	array = NULL;
 }

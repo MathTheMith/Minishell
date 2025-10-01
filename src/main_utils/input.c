@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   input.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/02 00:15:48 by tfournie          #+#    #+#             */
+/*   Updated: 2025/10/02 00:32:58 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -51,79 +61,30 @@ static char	*get_and_check_input(t_cmd *cmds)
 	return (input);
 }
 
-static void	free_all_helper(t_cmd *current, int i)
-{
-	if (current->args)
-	{
-		while (i < current->nb_args)
-		{
-			if (current->args[i])
-				free(current->args[i]);
-			i++;
-		}
-		free(current->args);
-	}
-	if (current->quoted)
-		free(current->quoted);
-	if (current->infile)
-		free(current->infile);
-	if (current->outfile)
-		free(current->outfile);
-}
-
-void	free_all(t_cmd **command, char *input)
-{
-	t_cmd	*current;
-	t_cmd	*next;
-	int		i;
-
-	if (input)
-		free(input);
-	if (!command || !*command)
-		return ;
-	current = *command;
-	while (current)
-	{
-		i = 0;
-		next = current->next;
-		free_all_helper(current, i);
-		current = next;
-		free(current);
-	}
-	*command = NULL;
-}
-
-
-
 int	process_input_loop(t_cmd *cmds, t_list *env_list)
 {
 	int		status;
 	char	*input;
 	t_cmd	**command;
-	char	**current_envp;
+	t_data	*data_ptr;
 
 	status = 0;
 	while (1)
 	{
 		input = get_and_check_input(cmds);
 		command = NULL;
+		data_ptr = NULL;
 		if (process_a(input))
 			break ;
 		if (parsing(input, &command, env_list, cmds->last_exit_code) == -1)
-		{
-			cmds->last_exit_code = process_lst(command, 2);
-			free(input);
-		}
+			handle_parsing_error(command, input, cmds);
 		else
 		{
-			current_envp = env_list_to_envp(env_list);
-			if (current_envp)
-				status = process(&cmds, command, env_list, current_envp);
-			else
-				cmds->last_exit_code = process_lst(command, 1);
+			if (command && *command)
+				data_ptr = (*command)->data;
+			status = execute_command(&cmds, command, env_list, data_ptr);
 		}
-		// process_c(command);
-	}	
+	}
 	if (cmds)
 		free_all_cmds(cmds, 1);
 	return (status);

@@ -1,4 +1,14 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_exit.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/02 00:13:29 by marvin            #+#    #+#             */
+/*   Updated: 2025/10/02 00:18:37 by marvin           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -37,22 +47,40 @@ void	exit_input(t_cmd *cmds, char **envp)
 	cleanup_and_exit_child(cmds, envp, NULL, exit_code);
 }
 
-void	exit_input_pipeline(t_cmd *cmds, char **envp)
+static int	calculate_exit_code(t_cmd *cmds)
 {
 	long long	num;
+
 	if (!cmds->args[1])
-		cleanup_and_exit_child(cmds, envp, NULL, 0);
-	if (!ft_atoll_safe(cmds->args[1], &num))
+		return (0);
+	else if (!ft_atoll_safe(cmds->args[1], &num))
 	{
 		ft_putstr_fd("minishell: exit: ", 2);
 		ft_putstr_fd(cmds->args[1], 2);
 		ft_putstr_fd(": numeric argument required\n", 2);
-		cleanup_and_exit_child(cmds, envp, NULL, 2);
+		return (2);
 	}
-	if (cmds->args[2])
+	else if (cmds->args[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-		cleanup_and_exit_child(cmds, envp, NULL, 1);
+		return (1);
 	}
-	cleanup_and_exit_child(cmds, envp, NULL, (unsigned char)(num % 256));
+	return ((unsigned char)(num % 256));
+}
+
+void	exit_input_pipeline(t_cmd *cmds, char **envp)
+{
+	int	exit_code;
+
+	exit_code = calculate_exit_code(cmds);
+	if (cmds->args)
+		free_string_array(cmds->args);
+	if (cmds->env)
+		free_env_list(cmds->env);
+	if (envp)
+		free_string_array(envp);
+	if (cmds)
+		free(cmds);
+	rl_clear_history();
+	exit(exit_code);
 }
