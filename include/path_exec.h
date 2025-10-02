@@ -15,18 +15,18 @@
 
 # include "minishell.h"
 
-/* Path validation and handling */
+/* Path validation */
 char	*handle_absolute_path(t_cmd *cmds, char *cmd);
 char	*get_path_env(char **envp);
+char	*absolute_path(char *cmd);
 
 /* Path searching */
 char	*search_in_paths(char *cmd, char **paths);
 char	*build_full_path(char *dir, char *cmd);
-
-/* Main path functions */
-char	*find_path(t_cmd *cmds, char *cmd, char **envp);
 char	*look_for_path(char *cmd, char **paths);
-char	*absolute_path(char *cmd);
+
+/* Main path function */
+char	*find_path(t_cmd *cmds, char *cmd, char **envp);
 
 /* Utilities */
 void	free_paths(char **paths);

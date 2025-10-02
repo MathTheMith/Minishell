@@ -37,16 +37,17 @@ int	handle_input_redirect(t_cmd *cmd, char *filename)
 
 int	is_delimiter_quoted(char *delimiter)
 {
-	size_t	len;
+	int	i;
 
 	if (!delimiter)
 		return (0);
-	len = ft_strlen(delimiter);
-	if (len < 2)
-		return (0);
-	if ((delimiter[0] == '\'' && delimiter[len - 1] == '\'')
-		|| (delimiter[0] == '"' && delimiter[len - 1] == '"'))
-		return (1);
+	i = 0;
+	while (delimiter[i])
+	{
+		if (delimiter[i] == '\'' || delimiter[i] == '"')
+			return (1);
+		i++;
+	}
 	return (0);
 }
 

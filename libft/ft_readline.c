@@ -6,13 +6,25 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 17:09:03 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 22:20:11 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/02 04:12:39 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "minishell.h"
 
-int	append_char_to_line(char **line, size_t *size, size_t *capacity, char c)
+static void	disable_bracketed_paste(void)
+{
+	write(1, "\033[?2004l", 8);
+}
+
+static void	enable_bracketed_paste(void)
+{
+	write(1, "\033[?2004h", 8);
+}
+
+static int	append_char_to_line(char **line, size_t *size,
+				size_t *capacity, char c)
 {
 	char	*new_line;
 
@@ -58,13 +70,21 @@ char	*ft_readline(void)
 	size_t	capacity;
 	int		status;
 
+	if (g_interrupt == 130)
+		return (NULL);
+	disable_bracketed_paste();
+	write(STDOUT_FILENO, "> ", 2);
 	size = 0;
 	capacity = 64;
 	line = malloc(capacity);
 	if (!line)
+	{
+		enable_bracketed_paste();
 		return (NULL);
+	}
 	status = ft_fill_line(&line, &size, &capacity);
-	if (status <= 0)
+	enable_bracketed_paste();
+	if (status <= 0 || g_interrupt == 130)
 	{
 		free(line);
 		return (NULL);

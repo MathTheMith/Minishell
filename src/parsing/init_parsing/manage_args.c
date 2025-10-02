@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   manage_args.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:04:37 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 14:04:38 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/10/02 01:09:03 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,10 @@ char	**manage_args(t_cmd *command, char *input_str)
 	args = smart_split_and_parse(command, spaced);
 	free(spaced);
 	if (!args)
-		return (NULL);
+	{
+		args = malloc(sizeof(char *) * 1);
+		if (args)
+			args[0] = NULL;
+	}
 	return (args);
 }

@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 00:16:24 by marvin            #+#    #+#             */
-/*   Updated: 2025/10/02 00:16:27 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/02 01:20:20 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,16 +20,6 @@ bool	process_a(char *input)
 		return (1);
 	}
 	return (0);
-}
-
-int	process_lst(t_cmd **command, int i)
-{
-	if (command)
-		free_all_cmds(*command, 1);
-	if (i == 1)
-		return (1);
-	else
-		return (2);
 }
 
 void	free_envp(char **envp)

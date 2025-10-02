@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 00:15:37 by marvin            #+#    #+#             */
-/*   Updated: 2025/10/02 00:27:08 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/02 00:57:36 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ void	free_data(t_data *data)
 
 static void	free_cmd_fields(t_cmd *cmd)
 {
+	int	i;
+
 	if (cmd->args)
 	{
 		free_args_array(cmd->args);
@@ -62,6 +64,18 @@ static void	free_cmd_fields(t_cmd *cmd)
 	{
 		free(cmd->outfile);
 		cmd->outfile = NULL;
+	}
+	if (cmd->heredoc_buffer)
+	{
+		i = 0;
+		while (i < cmd->heredoc_count)
+		{
+			if (cmd->heredoc_buffer[i])
+				free(cmd->heredoc_buffer[i]);
+			i++;
+		}
+		free(cmd->heredoc_buffer);
+		cmd->heredoc_buffer = NULL;
 	}
 }
 

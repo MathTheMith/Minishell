@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/02 00:12:56 by marvin            #+#    #+#             */
-/*   Updated: 2025/10/02 00:13:10 by marvin           ###   ########.fr       */
+/*   Updated: 2025/10/02 01:56:00 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ void	free_env_list(t_list *env_list)
 	}
 }
 
+// heredoc + exit after = leaks
+// ./Makefile = leaks
 int	main(int ac, char **av, char **envp)
 {
 	t_cmd	*cmds;
@@ -74,8 +76,8 @@ int	main(int ac, char **av, char **envp)
 	(void)av;
 	if (ac != 1)
 		return (1);
-	if (isatty(STDIN_FILENO) == 0 || isatty(STDOUT_FILENO) == 0)
-		return (1);
+	// if (isatty(STDIN_FILENO) == 0 || isatty(STDOUT_FILENO) == 0)
+	// 	return (1);
 	cmds = init_cmds();
 	if (!cmds)
 		return (1);

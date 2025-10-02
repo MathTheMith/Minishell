@@ -15,6 +15,8 @@ FAILED_TESTS=0
 TIMEOUT_DURATION=5
 VERBOSE=0
 
+VALGRIND_CMD="valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes --suppressions=readline.supp"
+
 # Fonction pour afficher l'aide
 show_help() {
     echo "Usage: $0 [OPTIONS]"
@@ -58,6 +60,33 @@ parse_args() {
     done
 }
 
+# Vérifie les fuites mémoire avec valgrind
+check_valgrind_leaks() {
+    local script="$1"
+    local temp_valgrind=$(mktemp)
+
+    $VALGRIND_CMD --log-file="$temp_valgrind" "$MINISHELL_PATH" < "$script" > /dev/null 2>&1
+
+    local lost=$(grep "definitely lost:" "$temp_valgrind" | awk '{print $4}')
+    local indirect=$(grep "indirectly lost:" "$temp_valgrind" | awk '{print $4}')
+    local possibly=$(grep "possibly lost:" "$temp_valgrind" | awk '{print $4}')
+    local still=$(grep "still reachable:" "$temp_valgrind" | awk '{print $3}')
+
+    rm -f "$temp_valgrind"
+
+    if [[ "$lost" != "0" ]]; then
+        echo "LEAK"
+    else
+        # Si tout est à 0 → pas de fuite
+        if [[ "$indirect" == "0" && "$possibly" == "0" && "$still" == "0" ]]; then
+            echo "OK"
+        else
+            # cas de blocs suppressés → on affiche "SUPPRESSED" mais pas ❌
+            echo "SUPPRESSED"
+        fi
+    fi
+}
+
 # Fonction CORRIGÉE pour exécuter une commande avec timeout
 run_command() {
     local cmd="$1"
@@ -68,11 +97,9 @@ run_command() {
     local temp_exitcode=$(mktemp)
     local temp_wrapper=$(mktemp)
 
-    # Créer le script de commande
     echo "$cmd" > "$temp_script"
     echo "exit" >> "$temp_script"
 
-    # Créer un wrapper qui capture le vrai exit code
     if [[ "$shell" == "bash" ]]; then
         cat > "$temp_wrapper" << 'EOF'
 #!/bin/bash
@@ -93,122 +120,110 @@ EOF
     local exit_code
     local error_msg=""
 
-    # Exécuter avec timeout
     timeout "$TIMEOUT_DURATION" "$temp_wrapper" "$temp_script" "$temp_stdout" "$temp_stderr" "$temp_exitcode"
     timeout_exit_code=$?
 
     if [[ $timeout_exit_code -eq 124 ]]; then
-        # Timeout
         exit_code=124
         error_msg="TIMEOUT"
     else
-        # Lire le vrai exit code depuis le fichier dédié
         if [[ -f "$temp_exitcode" && -s "$temp_exitcode" ]]; then
             exit_code=$(cat "$temp_exitcode" 2>/dev/null | tr -d '[:space:]')
             [[ -z "$exit_code" || ! "$exit_code" =~ ^[0-9]+$ ]] && exit_code=1
         else
             exit_code=1
         fi
-
-        # Lire stderr en nettoyant les caractères de contrôle
         if [[ -f "$temp_stderr" ]]; then
             error_msg=$(cat "$temp_stderr" 2>/dev/null | tr -d '\0' | sed 's/[[:cntrl:]]//g' | head -10 | tr '\n' ' ' | sed 's/[[:space:]]*$//')
         fi
     fi
 
-    # Nettoyage
-    rm -f "$temp_script" "$temp_stdout" "$temp_stderr" "$temp_wrapper" "$temp_exitcode"
+    rm -f "$temp_stdout" "$temp_stderr" "$temp_wrapper" "$temp_exitcode"
 
-    # Utiliser un séparateur plus sûr
-    echo "EXITCODE:${exit_code}:ENDEXITCODE:${error_msg}:ENDERROR"
+    echo "SCRIPT:$temp_script:EXITCODE:${exit_code}:ENDEXITCODE:${error_msg}:ENDERROR"
 }
 
-# Fonction pour formater l'affichage de la commande
+# Fonction pour formater l'affichage
 format_command_display() {
     local cmd="$1"
     if [[ -z "$cmd" ]]; then
         echo "[entrée vide]"
     elif [[ "$cmd" =~ ^[[:space:]]+$ ]]; then
-        # Remplacer les espaces par des points visibles
         echo "\"$(echo "$cmd" | sed 's/ /·/g' | sed 's/\t/→/g')\""
     else
         echo "$cmd"
     fi
 }
 
-# Fonction pour extraire l'exit code et l'erreur de façon sûre
+# Fonction pour extraire l'exit code et erreur
 extract_result() {
     local result="$1"
     local exit_code=$(echo "$result" | sed -n 's/.*EXITCODE:\([^:]*\):ENDEXITCODE.*/\1/p')
     local error_msg=$(echo "$result" | sed -n 's/.*:ENDEXITCODE:\(.*\):ENDERROR.*/\1/p')
-    
-    # Nettoyer l'exit code
+    local script=$(echo "$result" | sed -n 's/SCRIPT:\([^:]*\):EXITCODE.*/\1/p')
+
     exit_code=$(echo "$exit_code" | tr -d '[:space:]')
     [[ -z "$exit_code" || ! "$exit_code" =~ ^[0-9]+$ ]] && exit_code=1
-    
-    echo "${exit_code}|${error_msg}"
+
+    echo "${exit_code}|${error_msg}|${script}"
 }
 
-# Fonction pour exécuter un test de comparaison
+# Fonction de comparaison avec valgrind
 run_comparison_test() {
     local cmd="$1"
     local display_cmd=$(format_command_display "$cmd")
-    
+
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
-    
-    # Exécuter avec minishell
+
+    # Minishell
     local mini_result=$(run_command "$cmd" "mini")
     local mini_extracted=$(extract_result "$mini_result")
     local mini_exit=$(echo "$mini_extracted" | cut -d'|' -f1)
-    local mini_error=$(echo "$mini_extracted" | cut -d'|' -f2-)
+    local mini_error=$(echo "$mini_extracted" | cut -d'|' -f2- | cut -d'|' -f1)
+    local mini_script=$(echo "$mini_extracted" | cut -d'|' -f3)
 
-    # Exécuter avec bash
+    # Bash
     local bash_result=$(run_command "$cmd" "bash")
     local bash_extracted=$(extract_result "$bash_result")
     local bash_exit=$(echo "$bash_extracted" | cut -d'|' -f1)
     local bash_error=$(echo "$bash_extracted" | cut -d'|' -f2-)
-    
-    # Normaliser les messages d'erreur pour la comparaison
+
+    # Normalisation
     local mini_error_normalized=$(echo "$mini_error" | sed 's/minishell:/bash:/g' | tr -d '[:space:]')
     local bash_error_normalized=$(echo "$bash_error" | tr -d '[:space:]')
-    
-    # Comparer les résultats
+
     local test_status=""
     if [[ "$mini_exit" == "$bash_exit" ]]; then
         if [[ -z "$mini_error" && -z "$bash_error" ]] || [[ "$mini_error_normalized" == "$bash_error_normalized" ]]; then
-            # Test parfait
             test_status="✅"
             PASSED_TESTS=$((PASSED_TESTS + 1))
         else
-            # Exit code correct mais message d'erreur différent
             test_status="✅⚠️"
             PASSED_TESTS=$((PASSED_TESTS + 1))
         fi
     else
-        # Exit code différent = échec
         test_status="❌"
         FAILED_TESTS=$((FAILED_TESTS + 1))
     fi
-    
-    # Afficher le résultat
-    echo -e "Test $TOTAL_TESTS: $test_status $display_cmd"
-    
-    # Afficher les détails en cas d'échec ou de mode verbeux
-    if [[ "$test_status" == "❌" ]]; then
-        echo "  mini exit code = $mini_exit"
-        echo "  bash exit code = $bash_exit"
-        echo "  mini error = ($mini_error)"
-        echo "  bash error = ($bash_error)"
-    elif [[ "$test_status" == "✅⚠️" ]]; then
-        echo "  mini error = ($mini_error)"
-        echo "  bash error = ($bash_error)"
-    elif [[ $VERBOSE -eq 1 ]]; then
-        echo "  mini exit code = $mini_exit"
-        echo "  bash exit code = $bash_exit" 
-        echo "  mini error = ($mini_error)"
-        echo "  bash error = ($bash_error)"
+
+    # Vérification valgrind (seulement si minishell a tourné)
+    local leak_status=$(check_valgrind_leaks "$mini_script")
+    if [[ "$leak_status" == "LEAK" ]]; then
+        test_status="❌"
+        FAILED_TESTS=$((FAILED_TESTS + 1))
+        echo -e "Test $TOTAL_TESTS: $test_status $display_cmd"
+        echo "  ⚠️  Fuite mémoire détectée par valgrind"
+    elif [[ "$leak_status" == "SUPPRESSED" ]]; then
+        echo -e "Test $TOTAL_TESTS: $test_status $display_cmd"
+        [[ $VERBOSE -eq 1 ]] && echo "  valgrind: fuites ignorées (readline/libc)"
+    else
+        echo -e "Test $TOTAL_TESTS: $test_status $display_cmd"
+        [[ $VERBOSE -eq 1 ]] && echo "  valgrind: OK (aucune fuite)"
     fi
+
+    rm -f "$mini_script"
 }
+
 # Fonction principale de test
 run_all_tests() {
     echo -e "${BLUE}=== TESTEUR MINISHELL vs BASH ===${NC}"

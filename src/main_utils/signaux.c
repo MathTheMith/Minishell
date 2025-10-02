@@ -6,7 +6,7 @@
 /*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:03:36 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 14:03:36 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/10/02 20:00:00 by tfournie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,14 @@ void	setup_parent_signals(void)
 {
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
 }
 
 void	setup_child_signals(void)
 {
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
+	signal(SIGPIPE, SIG_DFL);
 }
 
 int	wait_for_child(pid_t pid)
@@ -59,6 +61,8 @@ int	wait_for_child(pid_t pid)
 			ft_putstr_fd("Quit (core dumped)\n", 1);
 			exit_code = 131;
 		}
+		else if (WTERMSIG(status) == SIGPIPE)
+			exit_code = 0;
 		else
 			exit_code = 128 + WTERMSIG(status);
 	}

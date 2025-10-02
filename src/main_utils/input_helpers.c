@@ -32,6 +32,16 @@ static void	free_cmd_helper(t_cmd *current, int i)
 		free(current->outfile);
 }
 
+int	handle_parsing_error(t_cmd **command, char *input, t_cmd *cmds)
+{
+	if (command && *command)
+		cmds->last_exit_code = 2;
+	else
+		cmds->last_exit_code = 2;
+	free(input);
+	return (0);
+}
+
 void	free_all(t_cmd **command, char *input)
 {
 	t_cmd	*current;
@@ -54,11 +64,14 @@ void	free_all(t_cmd **command, char *input)
 	*command = NULL;
 }
 
-int	handle_parsing_error(t_cmd **command, char *input, t_cmd *cmds)
+int	process_lst(t_cmd **command, int i)
 {
-	cmds->last_exit_code = process_lst(command, 2);
-	free(input);
-	return (0);
+	if (command && *command)  // AJOUT: Vérification
+		free_all_cmds(*command, 1);
+	if (i == 1)
+		return (1);
+	else
+		return (2);
 }
 
 void	cleanup_data(t_data *data_ptr)

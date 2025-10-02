@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/11 15:05:15 by tfournie          #+#    #+#             */
-/*   Updated: 2025/10/02 00:32:52 by marvin           ###   ########.fr       */
+/*   Created: 2025/10/02 00:38:42 by marvin            #+#    #+#             */
+/*   Updated: 2025/10/02 01:22:12 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,105 +32,107 @@ extern volatile sig_atomic_t	g_interrupt;
 
 typedef struct s_list
 {
-	char						*str;
-	struct s_list				*prev;
-	struct s_list				*next;
-}								t_list;
+	char			*str;
+	struct s_list	*prev;
+	struct s_list	*next;
+}	t_list;
 
 typedef struct s_cmd_exec
 {
-	char						*raw_cmd;
-	char						**args;
-	char						*path;
-}								t_cmd_exec;
+	char	*raw_cmd;
+	char	**args;
+	char	*path;
+}	t_cmd_exec;
 
 typedef struct s_data
 {
-	char						*input;
-	int							nb_cmd;
-	int							lec_save;
-}								t_data;
+	char	*input;
+	int		nb_cmd;
+	int		lec_save;
+}	t_data;
 
 typedef struct s_cmd
 {
-	t_data						*data;
-	int							id;
-	char						**args;
-	int							nb_args;
-	int							*quoted;
-	char						*infile;
-	int							ascending;
-	char						*outfile;
-	int							descending;
-	bool						pipe_in;
-	bool						pipe_out;
-	struct s_cmd				*next;
-	char						**envp;
-	t_list						*env;
-	int							last_exit_code;
-	pid_t						*pids;
-	int							cmd_count;
-	void						*command_array;
+	t_data			*data;
+	int				id;
+	char			**args;
+	int				nb_args;
+	int				*quoted;
+	char			*infile;
+	int				ascending;
+	char			*outfile;
+	int				descending;
+	bool			pipe_in;
+	bool			pipe_out;
+	struct s_cmd	*next;
+	char			**envp;
+	t_list			*env;
+	int				last_exit_code;
+	pid_t			*pids;
+	int				cmd_count;
+	void			*command_array;
+	char			**heredoc_buffer;
+	int				heredoc_count;
+}	t_cmd;
 
-}								t_cmd;
+/* Main execution */
+int		execute_command(t_cmd **cmds, t_cmd **command, t_list *env_list,
+			t_data *data_ptr);
+int		parsing(char *input, t_cmd ***command, t_list *env_list, int lec);
+int		check_info(t_cmd *cmds, t_cmd **command, char **envp);
+int		process_input_loop(t_cmd *cmds, t_list *env_list);
+int		process(t_cmd **cmds, t_cmd **command, t_list *env_list,
+			char **envp);
 
-int								execute_command(t_cmd **cmds, t_cmd **command,
-									t_list *env_list, t_data *data_ptr);
-int								parsing(char *input, t_cmd ***command,
-									t_list *env_list, int lec);
-void							print_data(t_cmd **command);
-void							free_args_array(char **args);
-int								handle_parsing_error(t_cmd **command,
-									char *input, t_cmd *cmds);
-int								check_info(t_cmd *cmds, t_cmd **command,
-									char **envp);
-char							*adjust_path_length(char *start,
-									int term_width);
-void							cleanup_and_exit_child(t_cmd *cmds,
-									char **envp, char **cleaned_args,
-									int exit_code);
-void							sigquit_handler(int signo);
-void							free_all_before_exec(t_cmd *current_cmd);
-void							sigint_handler(int signo);
-size_t							calculate_prompt_length(char *code,
-									char *start);
-void							update_command_data(t_cmd **cmds,
-									t_cmd **command, int save_exit,
-									t_list *env_list);
-char							*build_prompt(t_cmd *cmds);
-void							free_env_list(t_list *env_list);
-void							setup_parent_signals(void);
-void							setup_child_signals(void);
-int								process_input_loop(t_cmd *cmds,
-									t_list *env_list);
-int								wait_for_child(pid_t pid);
-void							ft_putstr_fd(char *s, int fd);
-void							free_clean_args(char **new_args, int j);
-void							free_cmd(t_cmd_exec *cmd);
-void							free_all_cmds(t_cmd *cmds, int is_free);
-void							exit_input(t_cmd *cmds, char **env);
-void							unset_input(t_cmd *cmds, t_list **env);
-int								process_single_cmd(t_cmd *current, t_cmd *cmds,
-									char **envp, int *prev_fd);
-void							exit_input_pipeline(t_cmd *cmds, char **envp);
-pid_t							fork_and_handle_child(t_cmd *current,
-									t_cmd *cmds, int prev_fd, int *pipefd);
-int								create_pipe_if_needed(t_cmd *current,
-									int *pipefd);
-void							env_input(t_cmd *cmds, char **envp);
-void							free_cleaned_args(char **cleaned_args);
-t_list							*create_env_list(char **envp);
-void							pwd_input(t_cmd *cmds);
-char							**env_list_to_envp(t_list *env_list);
-void							free_string_array(char **array);
-void							free_cleaned_args(char **cleaned_args);
-void							free_clean_args(char **new_args, int j);
-int								process_lst(t_cmd **command, int i);
-bool							process_a(char *input);
-void							free_one_cmd(t_cmd *cmd, int is_free);
-void							free_envp(char **envp);
-int								process(t_cmd **cmds, t_cmd **command,
-									t_list *env_list, char **envp);
-void							process_c(t_cmd **command);
+/* Error handling */
+int		handle_parsing_error(t_cmd **command, char *input, t_cmd *cmds);
+
+/* Signal handling */
+void	sigquit_handler(int signo);
+void	sigint_handler(int signo);
+void	setup_parent_signals(void);
+void	setup_child_signals(void);
+int		wait_for_child(pid_t pid);
+
+/* Prompt */
+char	*build_prompt(t_cmd *cmds);
+size_t	calculate_prompt_length(char *code, char *start);
+char	*adjust_path_length(char *start, int term_width);
+
+/* Memory management */
+void	free_cmd(t_cmd_exec *cmd);
+void	free_all_cmds(t_cmd *cmds, int is_free);
+void	free_one_cmd(t_cmd *cmd, int is_free);
+void	free_args_array(char **args);
+void	free_cleaned_args(char **cleaned_args);
+void	free_clean_args(char **new_args, int j);
+void	free_string_array(char **array);
+void	free_envp(char **envp);
+void	free_env_list(t_list *env_list);
+void	cleanup_and_exit_child(t_cmd *cmds, char **envp, char **cleaned_args,
+			int exit_code);
+
+/* Environment */
+t_list	*create_env_list(char **envp);
+char	**env_list_to_envp(t_list *env_list);
+void	env_input(t_cmd *cmds, char **envp);
+
+/* Builtins */
+void	exit_input(t_cmd *cmds, char **env);
+void	exit_input_pipeline(t_cmd *cmds, char **envp);
+void	unset_input(t_cmd *cmds, t_list **env);
+void	pwd_input(t_cmd *cmds);
+
+/* Process utilities */
+bool	process_a(char *input);
+int		process_lst(t_cmd **command, int i);
+void	process_c(t_cmd **command);
+
+/* Command update */
+void	update_command_data(t_cmd **cmds, t_cmd **command, int save_exit,
+			t_list *env_list);
+
+/* Debug */
+void	print_data(t_cmd **command);
 
 #endif

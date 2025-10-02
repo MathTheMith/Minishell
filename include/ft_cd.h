@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_cd.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tfournie <tfournie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/11 14:01:02 by tfournie          #+#    #+#             */
-/*   Updated: 2025/09/11 14:01:03 by tfournie         ###   ########.fr       */
+/*   Updated: 2025/10/02 00:38:17 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,14 @@ typedef struct s_cd_data
 	char	oldpwd[1000];
 	char	*resolved_dir;
 	int		arg_count;
-}			t_cd_data;
+}	t_cd_data;
 
-// Fonction principale
-void		cd_input(t_cmd *cmds);
+/* Main cd function */
+void	cd_input(t_cmd *cmds);
 
-// Fonctions utilitaires pour cd
-char		*expand_tilde(char *dir, t_cmd *cmds);
-char		*resolve_env_var(char *dir, t_cmd *cmds);
-
-// Fonctions pour gestion environnement
-void		add_to_env(t_list **env, char *name, char *value);
+/* Utility functions */
+char	*expand_tilde(char *dir, t_cmd *cmds);
+char	*resolve_env_var(char *dir, t_cmd *cmds);
+void	add_to_env(t_list **env, char *name, char *value);
 
 #endif
