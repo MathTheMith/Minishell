@@ -98,7 +98,7 @@ sudo apt-get install libreadline-dev
 
 ```bash
 # Clone the repo
-git clone https://github.com/YOUR_USERNAME/minishell.git
+git clone https://github.com/MathTheMith/minishell.git
 cd minishell
 
 # Build
@@ -154,7 +154,7 @@ minishell$ exit 0
 
 ## 👥 Authors
 
-- **Mathéo Vachon** — *École 42 Lyon* — [@mvachon](https://github.com/YOUR_USERNAME)
+- **Mathéo Vachon** — *École 42 Lyon* — [@mvachon](https://github.com/MathTheMith)
 
 ---
 
